@@ -46,7 +46,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
       <div class="modal-footer" style="padding-right: 20%">
       <!-- User input box -->
           <div style="display: inline;float: left;height: 47px;width: 25px;background-color: whitesmoke;margin-right: 80px;" class="fa fa-microphone" onclick="mic_click()"></i> </div> 
-          <input id="chatio__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;"" type="text" name="msg" placeholder="describe your memory">
+          <input id="askTobu_inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;" type="text" name="msg" placeholder="describe your memory">
           <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendButton()">Send</button></div>
       </div>
     </div>
@@ -83,7 +83,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
         <div class="modal-footer" style="padding-right: 20%">
         <!-- User input box -->
             <div style="display: inline;float: left;height: 47px;width: 25px;background-color: whitesmoke;margin-right: 80px;" class="fa fa-microphone" onclick="mic_click()"></i> </div> 
-            <input id="chatio__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;"" type="text" name="msg" placeholder="describe your memory">
+            <input id="chatio__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;" type="text" name="msg" placeholder="describe your memory">
             <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendButton()">Send</button></div>
         </div>
       </div>
@@ -153,6 +153,8 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 
 </div>
 `;
+
+var inputField = document.getElementById('chatio__inputField');
 
 var chat_messages = [];
 var create_memory_images = [];
@@ -259,11 +261,11 @@ memories = [
 
     r_memories = ``;
 
-    for (let r = 0; r < related_memories.length; r++) {
-      r_memories = r_memories + `<div class="td" onclick='open_modal()'></div>`;
-    }
-
     if(related_memories.length > 0){
+      for (let r = 0; r < related_memories.length; r++) {
+        r_memories = r_memories + `<div class="td" onclick='open_modal()'><img src="./images/nexus_oct_2019.jpg" style="height: 200px;"></div>`;
+      }
+
       card_footer = `
       <div class="card-footer" style="margin-bottom: 1%;">
       <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
@@ -362,8 +364,31 @@ walker_run_talk('talk', "I'd like to document a memory.").then((result) => {
 });
 
 
-function open_modal(){
-  $('#detailModal').modal('show');
+function sendButton(){
+  var utterance = inputField.value;
+  if(utterance){
+    chat_messages.push(["user", utterance]);
+  }
+
+
+  walker_run_talk('talk', utterance).then((result) => {
+
+
+    chat_messages.push(["bot", result.report[0]['response']]);
+    
+
+    update_messages();
+
+
+  }).catch(function (error) {
+      console.log(error);
+  });
+
+}
+
+
+function open_modal(memory_id){
+  $('#detailModal_'+memory_id).modal('show');
 }
 
 function readOutLoud(message){
@@ -441,32 +466,6 @@ function update_messages() {
     document.getElementById("chatbox").innerHTML = conv;
     inputField.value = '';
 }
-
-
-function sendButton(){
-  var utterance = inputField.value;
-  if(utterance){
-    chat_messages.push(["user", utterance]);
-  }
-
-  update_messages();
-
-  walker_run_talk('talk', utterance).then((result) => {
-
-
-    chat_messages.push(["bot", result.report[0]['response']]);
-    
-
-    update_messages();
-
-
-  }).catch(function (error) {
-      console.log(error);
-  });
-
-}
-
-
 
   
 function imageUploaded() {
