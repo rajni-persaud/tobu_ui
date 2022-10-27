@@ -45,7 +45,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
       </div>
       <div class="modal-footer" style="padding-right: 12%">
       <!-- User input box -->
-      <span class="fa-stack fa-1x"><i id="mic-bg" class="fa fa-circle fa-stack-2x icon-background" style="margin-left: -10px; color: #ffffff;"></i><i id="mic-btn" class="fa fa-microphone fa-stack-1x" style="margin-left: -7px;" onclick="mic_click()"></i></span>
+      <span class="fa-stack fa-1x"><i id="query_mic-bg" class="fa fa-circle fa-stack-2x icon-background" style="margin-left: -10px; color: #ffffff;"></i><i id="query_mic-btn" class="fa fa-microphone fa-stack-1x" style="margin-left: -7px;" onclick="query_mic_click()"></i></span>
           <input id="query__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;"" type="text" name="msg" placeholder="ask Tobu about your memories">
           <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendButton()">Send</button></div>
       </div>
@@ -354,6 +354,57 @@ function chat_mic_click(){
 }
 
 // ----------------- Chat Microphone --------------------------
+
+// ----------------- Query Microphone --------------------------
+
+var query_inputField = document.getElementById('query__inputField');
+var query_recognition = new speechRecognition()
+var query_textbox = $("#query__inputField")
+var query_content = ''
+
+query_recognition.continuous = true
+query_stat = true
+
+query_recognition.onstart = function(){
+    console.log("Recording start")
+    document.getElementById("query_mic-btn").style.color = "#ffffff";
+    document.getElementById("query_mic-bg").style.color = "#365d96";
+}
+
+query_recognition.onend = function(){
+    console.log("Recording end")
+    // chat_sendButton(); -- query send button function goes here
+    document.getElementById("query_mic-btn").style.color = "#000000";
+    document.getElementById("query_mic-bg").style.color = "#ffffff";
+    query_content = ''
+    query_textbox.val(chat_content)
+    query_stat = true
+}
+
+query_recognition.onresult = function(event){
+    var query_current = event.resultIndex;
+    var query_transcript = event.results[query_current][0].transcript
+    query_content += query_transcript
+    query_textbox.val(query_content)
+}
+
+function query_mic_click(){
+  if(query_stat){
+      if(query_content.length){
+          query_content += ''
+      }
+  
+      query_recognition.continuous = true
+      query_recognition.start()
+      query_stat = false   
+  }
+  else{
+      query_recognition.stop()
+  }
+}
+
+// ----------------- Query Microphone --------------------------
+
 
 function update_messages() {
   conv = "";
