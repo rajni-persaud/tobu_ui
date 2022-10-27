@@ -165,26 +165,85 @@ walker_get_memories().then((result) => {
 
   memories = result.report[0];
 
-  memories = [
-    {
-        "id": "ipsum62780",
-        "subject": " I'd like to document a memory.. Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-        "how": "happy",
-        "where": "florida",
-        "summary": " I'd like to document a memory.. I'd like to document a memory.. Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?. We were in florida and we had an amazing time.",
-        "date": "2022-10-26",
-        "category": "birthday"
-    },
-    {
-        "id": "neque41126",
-        "subject": " I went to my son's soccer game in Miami yesterday .",
-        "how": "happy",
-        "where": "orland",
-        "summary": " I went to my son's soccer game in Miami yesterday . Luckily John was there to keep me company. oh my gosh nice catch change there i was in orland instead thanks.",
-        "date": "2022-10-26",
-        "category": "sport"
-    }
-];
+
+memories = [
+      {
+          "id": "neque634",
+          "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+          "how": "happy",
+          "where": "florida",
+          "summary": " I'd like to document a memory. Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?. We were in florida and we had an amazing time.",
+          "date": "2022-10-26",
+          "category": "birthday",
+          "files": "amet27117106",
+          "releatedMemories": [
+              {
+                  "id": "neque634",
+                  "date": "2022-10-26",
+                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+                  "category": "birthday",
+                  "when": "yesterday"
+              },
+              {
+                  "id": "incidunt72617",
+                  "date": "2022-10-26",
+                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+                  "category": "birthday",
+                  "when": "yesterday"
+              }
+          ]
+      },
+      {
+          "id": "incidunt72617",
+          "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+          "how": "happy",
+          "where": "florida",
+          "summary": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?. We were in florida and we had an amazing time.",
+          "date": "2022-10-26",
+          "category": "birthday",
+          "releatedMemories": [
+              {
+                  "id": "neque634",
+                  "date": "2022-10-26",
+                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+                  "category": "birthday",
+                  "when": "yesterday"
+              },
+              {
+                  "id": "incidunt72617",
+                  "date": "2022-10-26",
+                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+                  "category": "birthday",
+                  "when": "yesterday"
+              }
+          ]
+      },
+      {
+          "id": "aliquam65899",
+          "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+          "how": "happy",
+          "where": "florida",
+          "summary": " Yes, that's correct. Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?. We were in florida and we had an amazing time.",
+          "date": "2022-10-26",
+          "category": "birthday",
+          "releatedMemories": [
+              {
+                  "id": "neque634",
+                  "date": "2022-10-26",
+                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+                  "category": "birthday",
+                  "when": "yesterday"
+              },
+              {
+                  "id": "incidunt72617",
+                  "date": "2022-10-26",
+                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+                  "category": "birthday",
+                  "when": "yesterday"
+              }
+          ]
+      }
+  ];
 
   console.log(memories);
 
@@ -193,6 +252,37 @@ walker_get_memories().then((result) => {
     m_keys = Object.keys(memories[i]);
 
     console.log(m_keys);
+
+    if (m_keys.includes("releatedMemories")){
+
+    related_memories = memories[i]["releatedMemories"];
+
+    r_memories = ``;
+
+    for (let r = 0; r < related_memories.length; r++) {
+      r_memories = r_memories + `<div class="td" onclick='open_modal()'></div>`;
+    }
+
+    if(related_memories.length > 0){
+      card_footer = `
+      <div class="card-footer" style="margin-bottom: 1%;">
+      <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
+      <div id="photos">
+        <div class="tb">
+          <div class="tr">
+            ${r_memories}
+          </div>
+          
+        </div>
+      </div>
+    </div>
+      `;
+    }
+    else{
+      card_footer = ``;
+    }
+  }
+    
 
     if (m_keys.includes("file_ids")){
 
@@ -212,19 +302,7 @@ walker_get_memories().then((result) => {
             <p class="card-text">${memories[i]["summary"]}</p>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
           </div>
-          <div class="card-footer" style="margin-bottom: 1%;">
-            <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-            <div id="photos">
-              <div class="tb">
-                <div class="tr">
-                  <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
-                  <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
-                  <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
-                </div>
-                
-              </div>
-            </div>
-          </div>
+          ${card_footer}
   
         </div> 
           `
@@ -240,6 +318,7 @@ walker_get_memories().then((result) => {
     }
 
     else{
+
       $("#all_memories").append(
         `
         <div class="card mb-3">
@@ -250,19 +329,7 @@ walker_get_memories().then((result) => {
           <p class="card-text">${memories[i]["summary"]}</p>
           <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
         </div>
-        <div class="card-footer" style="margin-bottom: 1%;">
-          <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-          <div id="photos">
-            <div class="tb">
-              <div class="tr">
-                <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
-                <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
-                <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
-              </div>
-              
-            </div>
-          </div>
-        </div>
+        ${card_footer}
 
       </div> 
         `
@@ -372,7 +439,6 @@ function update_messages() {
       conv = conv + new_message;
     }
     document.getElementById("chatbox").innerHTML = conv;
-    // document.getElementById("chat-bar-bottom").scrollIntoView(true);
     inputField.value = '';
 }
 
