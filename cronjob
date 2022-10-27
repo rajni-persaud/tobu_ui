@@ -1,0 +1,1 @@
+* * * * * cd /tobu_ui && git pull && cp -r /tobu_ui/* /usr/share/nginx/html/

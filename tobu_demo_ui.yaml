@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tobu-demo-ui
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.23.2
+          ports:
+            - containerPort: 80
+          command: [bash, -c, "source script/start_up"]
+          volumeMounts:
+            - name: startup-script
+              mountPath: /script
+        
+      volumes:
+        - name: startup-script
+          configMap:
+            name: startup-script
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tobu-demo-ui-nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: startup-script
+  namespace: default
+data:
+  start_up: |-
+    apt update; apt -y upgrade; apt -y install --no-install-recommends git ca-certificates cron;
+    git clone https://github.com/rajni-persaud/tobu_ui.git /tobu_ui
+    cp -r /tobu_ui/* /usr/share/nginx/html/
+    crontab /tobu_ui/cronjob
+    service cron reload;
+    nginx -g "daemon off;"
+---
