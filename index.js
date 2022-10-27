@@ -4,7 +4,7 @@ var walker = document.getElementById("app-interact").getAttribute('data-walkerna
 var token = document.getElementById("app-interact").getAttribute('data-token');
 var last_jid = null;
 
-say = "Arianna is growing up so fast. Today she's been trying to stand on her own. It fills me up with such a sense of joy to see my little girl blossom before me.";
+//say = "Arianna is growing up so fast. Today she's been trying to stand on her own. It fills me up with such a sense of joy to see my little girl blossom before me.";
 
 
 // // Replace the script tag with the app
@@ -20,7 +20,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 
 <div id="navbarSupportedContent" class="collapse navbar-collapse">
     <ul class="navbar-nav ml-auto">
-    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#createMemoryModal" style="
+    <button type="button" class="btn btn-outline-secondary" onclick="display_capture_modal()" style="
     background-color: #feb248;"><i class="fa fa-picture-o"></i> Capture a memory</button>
   <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#ask_tobu_modal"><i class="fa fa-microphone"></i> Ask Tobu</button>
 
@@ -46,7 +46,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
       <div class="modal-footer" style="padding-right: 20%">
       <!-- User input box -->
           <div style="display: inline;float: left;height: 47px;width: 25px;background-color: whitesmoke;margin-right: 80px;" class="fa fa-microphone" onclick="mic_click()"></i> </div> 
-          <input id="chatio__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;"" type="text" name="msg" placeholder="describe your memory">
+          <input id="query__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;"" type="text" name="msg" placeholder="ask Tobu about your memories">
           <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendButton()">Send</button></div>
       </div>
     </div>
@@ -54,7 +54,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 </div>
 
   
-<!-- Modal -->
+<!-- Capture Memory Modal -->
   <div class="modal fade" id="createMemoryModal" tabindex="-1" aria-labelledby="createMemoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -65,9 +65,8 @@ document.getElementById('app-interact').parentNode.innerHTML = `
         <div class="modal-body">
         <!-- <button type="button" class="btn btn-outline-secondary">Add Photo/Video</button> -->
           
-        <input type="file" name="" id="fileId" 
-        onchange="imageUploaded()">
-    <br><br>
+        <input type="file" name="" id="fileId" onchange="imageUploaded()">
+        <br><br>
   
           <div id="photos">
             <div class="tb">
@@ -78,7 +77,9 @@ document.getElementById('app-interact').parentNode.innerHTML = `
               </div>
             </div>
           </div>
+
           <div id="chatbox"></div>
+
         </div>
         <div class="modal-footer" style="padding-right: 20%">
         <!-- User input box -->
@@ -91,22 +92,19 @@ document.getElementById('app-interact').parentNode.innerHTML = `
   </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+<!-- Memory Modal -->
+<div class="modal fade" id="memoryModal" tabindex="-1" aria-labelledby="memoryModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <p class="modal-title" id="detailModalLabel"> Memory Details</p>
+        <p class="modal-title" id="memoryModal_title"></p>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
       
       <div class="card mb-3">
-  <img src="./images/nexus_oct_2019.jpg" class="card-img-top" alt="..." onclick='open_modal()'>
+  <img id="memoryModal_photo" src="./images/tobu_iconic_logo.jpg" class="card-img-top" alt="..." onclick='open_modal()'>
   <div class="card-body">
-    <h5 class="card-title" style="margin-bottom: 0px;">Arianna is growing up so fast</h5>
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>23 Oct, 2022<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>Ann Arbor, MI</small></p>
-
     <div style="display: inline;float: right;">
       <a type="text" class="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
       <div class="dropdown-menu">
@@ -115,26 +113,29 @@ document.getElementById('app-interact').parentNode.innerHTML = `
         <a class="dropdown-item" href="#">Delete</a>
       </div>
     </div>
+    <h5 id="memoryModal_subject" class="card-title" style="margin-bottom: 0px;"></h5>
+    <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span><span id="memoryModal_date">23 Oct, 2022</span><span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span><span id="memoryModal_where">Ann Arbor, MI</span></small></p>
 
 <p class="card-text"></p>
-    <p class="card-text">Today she's been trying to stand on her own. It fills me up with such a sense of joy to see my little girl blossom before me.</p>
+    <p id="memoryModal_description" class="card-text"></p>
     <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
   </div>
 
-  <div class="card-footer" style="margin-bottom: 1%;">
+  <div id="memoryModal_related_memories" class="card-footer" style="margin-bottom: 1%;">
     <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
     <div id="photos">
+    
       <div class="tb">
         <div class="tr">
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
+          <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
+          <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
+          <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
         </div>
 
         <div class="tr">
-        <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-        <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-        <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
+        <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
+        <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
+        <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
       </div>
 
       </div>
@@ -157,132 +158,55 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 var chat_messages = [];
 var create_memory_images = [];
 
-var memories = [];
+//fetches and renders memories in the feed area
+function display_memory_feed() {
+  var memories = [];
+  
+  walker_get_memories().then((result) => {
+    
+    memories = result.report[0];  
+    render_memories(memories);
 
+  }).catch(function (error) {
+    console.log(error);
+  });
+}
 
-walker_get_memories().then((result) => {
-
-
-  memories = result.report[0];
-
-
-memories = [
-      {
-          "id": "neque634",
-          "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-          "how": "happy",
-          "where": "florida",
-          "summary": " I'd like to document a memory. Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?. We were in florida and we had an amazing time.",
-          "date": "2022-10-26",
-          "category": "birthday",
-          "files": "amet27117106",
-          "releatedMemories": [
-              {
-                  "id": "neque634",
-                  "date": "2022-10-26",
-                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-                  "category": "birthday",
-                  "when": "yesterday"
-              },
-              {
-                  "id": "incidunt72617",
-                  "date": "2022-10-26",
-                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-                  "category": "birthday",
-                  "when": "yesterday"
-              }
-          ]
-      },
-      {
-          "id": "incidunt72617",
-          "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-          "how": "happy",
-          "where": "florida",
-          "summary": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?. We were in florida and we had an amazing time.",
-          "date": "2022-10-26",
-          "category": "birthday",
-          "releatedMemories": [
-              {
-                  "id": "neque634",
-                  "date": "2022-10-26",
-                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-                  "category": "birthday",
-                  "when": "yesterday"
-              },
-              {
-                  "id": "incidunt72617",
-                  "date": "2022-10-26",
-                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-                  "category": "birthday",
-                  "when": "yesterday"
-              }
-          ]
-      },
-      {
-          "id": "aliquam65899",
-          "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-          "how": "happy",
-          "where": "florida",
-          "summary": " Yes, that's correct. Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?. We were in florida and we had an amazing time.",
-          "date": "2022-10-26",
-          "category": "birthday",
-          "releatedMemories": [
-              {
-                  "id": "neque634",
-                  "date": "2022-10-26",
-                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-                  "category": "birthday",
-                  "when": "yesterday"
-              },
-              {
-                  "id": "incidunt72617",
-                  "date": "2022-10-26",
-                  "subject": " Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
-                  "category": "birthday",
-                  "when": "yesterday"
-              }
-          ]
-      }
-  ];
-
-  console.log(memories);
+//takes an array of memories and renders memory posts in the memory feed.
+function render_memories(memories) {
 
   for (let i = 0; i < memories.length; i++) {
-    console.log(memories[i]);
+
     m_keys = Object.keys(memories[i]);
 
-    console.log(m_keys);
-
     if (m_keys.includes("releatedMemories")){
+      related_memories = memories[i]["releatedMemories"];
+      r_memories = ``;
 
-    related_memories = memories[i]["releatedMemories"];
+      if(related_memories.length > 0) {
+        
+        for (let r = 0; r < related_memories.length; r++) {
+          r_memories = r_memories + `<div class="td" onclick="display_memory_modal('${related_memories[i]["id"]}')"></div>`;
+        }
 
-    r_memories = ``;
-
-    for (let r = 0; r < related_memories.length; r++) {
-      r_memories = r_memories + `<div class="td" onclick='open_modal()'></div>`;
-    }
-
-    if(related_memories.length > 0){
-      card_footer = `
-      <div class="card-footer" style="margin-bottom: 1%;">
-      <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-      <div id="photos">
-        <div class="tb">
-          <div class="tr">
-            ${r_memories}
+        card_footer = `
+        <div class="card-footer" style="margin-bottom: 1%;">
+        <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
+        <div id="photos">
+          <div class="tb">
+            <div class="tr">
+              ${r_memories}
+            </div>
+            
           </div>
-          
         </div>
       </div>
-    </div>
-      `;
+        `;
+      }
+      else{
+        card_footer = ``;
+      }
     }
-    else{
-      card_footer = ``;
-    }
-  }
-    
 
     if (m_keys.includes("file_ids")){
 
@@ -290,20 +214,19 @@ memories = [
 
         console.log(result.report[0][0]['context']['base64']);
 
-
         $("#all_memories").append(
           `
           <div class="card mb-3">
-          <img src="data:image/png;base64,"+ ${result.report[0][0]['context']['base64']}" class="card-img-top" alt="..." onclick='open_modal()'>
+          <img src="data:image/png;base64,"+ ${result.report[0][0]['context']['base64']}" class="card-img-top" alt="..." onclick='display_memory_modal(${memories[i]["id"]})'>
           <div class="card-body">
-            <h5 class="card-title" style="margin-bottom: 0px;">${memories[i]["subject"]}</h5>
+            <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
             <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>${memories[i]["date"]}<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
             <p class="card-text"></p>
             <p class="card-text">${memories[i]["summary"]}</p>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
           </div>
           ${card_footer}
-  
+
         </div> 
           `
         );
@@ -313,17 +236,13 @@ memories = [
           console.log(error);
       });
 
-
-
-    }
-
-    else{
+    } else {
 
       $("#all_memories").append(
         `
         <div class="card mb-3">
         <div class="card-body">
-          <h5 class="card-title" style="margin-bottom: 0px;" onclick="open_modal()">${memories[i]["subject"]}</h5>
+          <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
           <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>${memories[i]["date"]}<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
           <p class="card-text"></p>
           <p class="card-text">${memories[i]["summary"]}</p>
@@ -335,36 +254,37 @@ memories = [
         `
       );
     }
-    
-
   }
-  
-
-
-}).catch(function (error) {
-    console.log(error);
-});
-
-
-
-
-walker_run_talk('talk', "I'd like to document a memory.").then((result) => {
-
-
-  chat_messages.push(["bot", result.report[0]['response']]);
-  
-
-  update_messages();
-
-
-}).catch(function (error) {
-    console.log(error);
-});
-
-
-function open_modal(){
-  $('#detailModal').modal('show');
 }
+
+//displays the capture a memory modal
+function display_capture_modal() {
+  
+  //reset the conversation
+  chat_messages = [];
+  create_memory_images = [];
+
+  $('#createMemoryModal').modal('show');
+
+  walker_run_talk('talk', "Document a memory").then((result) => {
+    chat_messages.push(["bot", result.report[0]['response']]);  
+    update_messages();
+  }).catch(function (error) {
+      console.log(error);
+  });
+  
+}
+
+function display_memory_modal(id) {
+  
+  $('#memoryModal_title').text('TThis is the title');
+  $('#memoryModal_subject').text('This is the subject');
+  $('#memoryModal_date').text('23 Oct, 2022');
+  $('#memoryModal_where').text('Ann Arbor, MI');
+  $('#memoryModal_description').text('This is the full description');
+  $('#memoryModal').modal('show');
+}
+
 
 function readOutLoud(message){
   speech = new SpeechSynthesisUtterance(message);
@@ -376,17 +296,12 @@ function readOutLoud(message){
 
 // ----------------- Microphone --------------------------
 var inputField = document.getElementById('chatio__inputField');
-
 var speechRecognition = window.webkitSpeechRecognition
-
 var recognition = new speechRecognition()
-
 var textbox = $("#chatio__inputField")
-
 var content = ''
 
 recognition.continuous = true
-
 stat = true
 
 recognition.onstart = function(){
@@ -445,6 +360,7 @@ function update_messages() {
 
 function sendButton(){
   var utterance = inputField.value;
+
   if(utterance){
     chat_messages.push(["user", utterance]);
   }
@@ -452,14 +368,8 @@ function sendButton(){
   update_messages();
 
   walker_run_talk('talk', utterance).then((result) => {
-
-
     chat_messages.push(["bot", result.report[0]['response']]);
-    
-
     update_messages();
-
-
   }).catch(function (error) {
       console.log(error);
   });
@@ -467,49 +377,40 @@ function sendButton(){
 }
 
 
-
-  
 function imageUploaded() {
 
   var base64String = "";
-let file_name = "";
+  let file_name = "";
 
-    var file = document.querySelector(
-        'input[type=file]')['files'][0];
-  
-    var reader = new FileReader();
-      
-    reader.onload = function () {
-        base64String = reader.result.replace("data:", "")
-            .replace(/^.+,/, "");
-  
-        imageBase64Stringsep = base64String;
+  var file = document.querySelector(
+      'input[type=file]')['files'][0];
 
-        create_memory_images.push(base64String);
-
-        console.log(create_memory_images);
-  
-        // console.log(base64String);
-
-        walker_run_upload("test", base64String).then((result) => {
-
-          console.log(result.report[0][0]['context']['id']);
-
-
-          for (let i = 0; i < create_memory_images.length; i++) {
-            a = i + 1;
-            image_src = 'data:image/png;base64,'+ create_memory_images[i];
-            document.getElementById("photo_"+a).innerHTML = `<img src="${image_src}" style="height: 200px;">`;
-          }
-
-        }).catch(function (error) {
-            console.log(error);
-        });
-    }
-
- 
-    reader.readAsDataURL(file);
+  var reader = new FileReader();
     
+  reader.onload = function () {
+      base64String = reader.result.replace("data:", "")
+          .replace(/^.+,/, "");
+      imageBase64Stringsep = base64String;
+      create_memory_images.push(base64String);
+      console.log(create_memory_images);
+      // console.log(base64String);
+
+      walker_run_upload("test", base64String).then((result) => {
+
+        console.log(result.report[0][0]['context']['id']);
+
+        for (let i = 0; i < create_memory_images.length; i++) {
+          a = i + 1;
+          image_src = 'data:image/png;base64,'+ create_memory_images[i];
+          document.getElementById("photo_"+a).innerHTML = `<img src="${image_src}" style="height: 200px;">`;
+        }
+
+      }).catch(function (error) {
+          console.log(error);
+      });
+  }
+
+  reader.readAsDataURL(file);
 }
 
 
@@ -534,6 +435,8 @@ function walker_run_talk(name, utterance="") {
     return result.json();
   });
 }
+
+
 
 function walker_run_upload(name, base64="") {
 
@@ -563,6 +466,8 @@ function walker_run_upload(name, base64="") {
   });
 }
 
+
+
 function walker_get_memories() {
 
   query = `
@@ -583,6 +488,8 @@ function walker_get_memories() {
     return result.json();
   });
 }
+
+
 
 function walker_get_base64(fild_id) {
 
@@ -606,3 +513,6 @@ function walker_get_base64(fild_id) {
     return result.json();
   });
 }
+
+
+display_memory_feed();
