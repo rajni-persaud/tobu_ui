@@ -43,9 +43,9 @@ document.getElementById('app-interact').parentNode.innerHTML = `
         <h5 class="modal-title" id="exampleModalLabel">Ask Tobu</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
-      <div class="modal-footer" style="padding-right: 20%">
+      <div class="modal-footer" style="padding-right: 12%">
       <!-- User input box -->
-          <div style="display: inline;float: left;height: 47px;width: 25px;background-color: whitesmoke;margin-right: 80px;" class="fa fa-microphone" onclick="mic_click()"></i> </div> 
+      <span class="fa-stack fa-1x"><i id="mic-bg" class="fa fa-circle fa-stack-2x icon-background" style="margin-left: -10px; color: #ffffff;"></i><i id="mic-btn" class="fa fa-microphone fa-stack-1x" style="margin-left: -7px;" onclick="mic_click()"></i></span>
           <input id="query__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;"" type="text" name="msg" placeholder="ask Tobu about your memories">
           <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendButton()">Send</button></div>
       </div>
@@ -81,10 +81,10 @@ document.getElementById('app-interact').parentNode.innerHTML = `
           <div id="chatbox"></div>
 
         </div>
-        <div class="modal-footer" style="padding-right: 20%">
+        <div class="modal-footer" style="padding-right: 10%">
         <!-- User input box -->
-            <div style="display: inline;float: left;height: 47px;width: 25px;background-color: whitesmoke;margin-right: 80px;" class="fa fa-microphone" onclick="mic_click()"></i> </div> 
-            <input id="chatio__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;"" type="text" name="msg" placeholder="describe your memory">
+            <span class="fa-stack fa-1x"><i id="mic-bg" class="fa fa-circle fa-stack-2x icon-background" style="margin-left: -13px; color: #ffffff;"></i><i id="mic-btn" class="fa fa-microphone fa-stack-1x" style="margin-left: -5px;" onclick="mic_click()"></i></span> 
+            <input id="chatio__inputField" style="width: 950px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;" "="" type="text" name="msg" placeholder="describe your memory">
             <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendButton()">Send</button></div>
         </div>
       </div>
@@ -258,7 +258,9 @@ function display_capture_modal() {
   $('#createMemoryModal').modal('show');
 
   walker_run_talk('talk', "Document a memory").then((result) => {
-    chat_messages.push(["bot", result.report[0]['response']]);  
+    chat_messages.push(["bot", result.report[0]['response']]);
+    readOutLoud(result.report[0]['response']); 
+
     update_messages();
   }).catch(function (error) {
       console.log(error);
@@ -314,6 +316,8 @@ stat = true
 
 recognition.onstart = function(){
     console.log("Recording start")
+    document.getElementById("mic-btn").style.color = "#ffffff";
+    document.getElementById("mic-bg").style.color = "#365d96";
 }
 
 recognition.onend = function(){
@@ -321,6 +325,8 @@ recognition.onend = function(){
     sendButton()
     let userHtml = '<p class="userText"><span>' + inputField.value + '</span></p>';
     $("#chatbox").append(userHtml);
+    document.getElementById("mic-btn").style.color = "#000000";
+    document.getElementById("mic-bg").style.color = "#ffffff";
     content = ''
     textbox.val(content)
     stat = true
@@ -373,14 +379,18 @@ function sendButton(){
     chat_messages.push(["user", utterance]);
   }
 
-  update_messages();
-
-  walker_run_talk('talk', utterance).then((result) => {
-    chat_messages.push(["bot", result.report[0]['response']]);
     update_messages();
-  }).catch(function (error) {
-      console.log(error);
-  });
+
+    walker_run_talk('talk', utterance).then((result) => {
+      chat_messages.push(["bot", result.report[0]['response']]);
+      readOutLoud(result.report[0]['response']); 
+
+      update_messages();
+
+    }).catch(function (error) {
+        console.log(error);
+    });
+
 
 }
 
@@ -403,9 +413,13 @@ function imageUploaded() {
       console.log(create_memory_images);
       // console.log(base64String);
 
-      walker_run_upload("test", base64String).then((result) => {
+      walker_run_upload(Date.now(), base64String).then((result) => {
 
         console.log(result.report[0][0]['context']['id']);
+
+        if(create_memory_images.length > 0){
+          document.getElementById("photos").style.display = "block";
+        }
 
         for (let i = 0; i < create_memory_images.length; i++) {
           a = i + 1;

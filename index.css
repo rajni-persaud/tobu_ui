@@ -62,14 +62,16 @@ img {
 #photos {
     padding: 2px;
     margin: 15px -20px -20px -20px;
+    display: none;
+    padding-bottom: 10%;
   }
   
   #photos .td {
     width: 33.333%;
     height: 200px;
-    border: 2px solid #fff;
+    /* border: 2px solid #fff;
     box-sizing: border-box;
-    background-color: #f1f1f1;
+    background-color: #f1f1f1; */
     background-position: 50% 25%;
     background-size: cover;
   }
@@ -176,6 +178,14 @@ input[type="text"]:focus,
     border: 0;
     border-radius: 0;
   }
+
+  .modal-content  {
+    -webkit-border-radius: 0px !important;
+    -moz-border-radius: 0px !important;
+    border-radius: 0px !important; 
+  }
+
+
   .modal .modal-body {
     overflow-y: auto;
   }
