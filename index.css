@@ -188,6 +188,7 @@ input[type="text"]:focus,
   .modal-header > button{
     background-color: #365d96;
     color: white;
+    border: none;
   }
 
   .navbar-nav > button{

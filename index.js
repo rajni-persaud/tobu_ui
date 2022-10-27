@@ -6,6 +6,7 @@ var last_jid = null;
 
 say = "Arianna is growing up so fast. Today she's been trying to stand on her own. It fills me up with such a sense of joy to see my little girl blossom before me.";
 
+
 // // Replace the script tag with the app
 document.getElementById('app-interact').parentNode.innerHTML = `
 <!-- NAVBAR--><nav class="navbar navbar-expand-sm navbar-dark">
@@ -21,7 +22,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
     <ul class="navbar-nav ml-auto">
     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#createMemoryModal" style="
     background-color: #feb248;"><i class="fa fa-picture-o"></i> Capture a memory</button>
-  <button type="button" class="btn btn-outline-secondary"><i class="fa fa-microphone"></i> Ask Tobu</button>
+  <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#ask_tobu_modal"><i class="fa fa-microphone"></i> Ask Tobu</button>
 
     </ul>
 </div>
@@ -33,8 +34,27 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 <div>
 
 <div class="btn-group" style="padding-bottom: 10px;">
+
+
+<div class="modal fade" id="ask_tobu_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="height: 18%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Ask Tobu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-footer" style="padding-right: 20%">
+      <!-- User input box -->
+          <div style="display: inline;float: left;height: 47px;width: 25px;background-color: whitesmoke;margin-right: 80px;" class="fa fa-microphone" onclick="mic_click()"></i> </div> 
+          <input id="chatio__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;"" type="text" name="msg" placeholder="describe your memory">
+          <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendButton()">Send</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
   
-  <!-- Modal -->
+<!-- Modal -->
   <div class="modal fade" id="createMemoryModal" tabindex="-1" aria-labelledby="createMemoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -49,7 +69,6 @@ document.getElementById('app-interact').parentNode.innerHTML = `
         onchange="imageUploaded()">
     <br><br>
   
-
           <div id="photos">
             <div class="tb">
               <div class="tr">
@@ -59,9 +78,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
               </div>
             </div>
           </div>
-
           <div id="chatbox"></div>
-
         </div>
         <div class="modal-footer" style="padding-right: 20%">
         <!-- User input box -->
@@ -132,104 +149,137 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 </div>
 
 
-
-
-<div class="card mb-3">
-  <img src="./images/nexus_oct_2019.jpg" class="card-img-top" alt="..." onclick='open_modal()'>
-  <div class="card-body">
-    <h5 class="card-title" style="margin-bottom: 0px;">Arianna is growing up so fast</h5>
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>23 Oct, 2022<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>Ann Arbor, MI</small></p>
-    <p class="card-text"></p>
-    <p class="card-text">Today she's been trying to stand on her own. It fills me up with such a sense of joy to see my little girl blossom before me.</p>
-    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-  </div>
-  <div class="card-footer" style="margin-bottom: 1%;">
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-    <div id="photos">
-      <div class="tb">
-        <div class="tr">
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
-        </div>
-        
-      </div>
-    </div>
-  </div>
-
-</div> 
-
-<div class="card mb-3">
-  <div class="card-body">
-    <h5 class="card-title" style="margin-bottom: 0px;" onclick="open_modal()">A text-based memory</h5>
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-frown-o" style="color: blue;"></i></span>13 Oct, 2022<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>Ann Arbor, MI</small></p>
-    <p class="card-text"></p>
-    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-  </div>
-  <div class="card-footer" style="margin-bottom: 1%;">
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-    <div id="photos">
-      <div class="tb">
-        <div class="tr">
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div> 
-
-<div class="card mb-3">
-  <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-  </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-        <img src="./images/tobu_logo.png" class="d-block w-100" alt="...">
-    </div>
-    <div class="carousel-item">
-      <img src="./images/nexus_oct_2019.jpg" class="d-block w-100" alt="...">
-    </div>
-    <div class="carousel-item">
-      <img src="./images/tobu_logo.png" class="d-block w-100" alt="...">
-    </div>
-  </div>
-  </div>
-
-  <div class="card-body">
-    <h5 class="card-title" style="margin-bottom: 0px;">Arianna is growing up so fast</h5>
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>23 Oct, 2022<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>Ann Arbor, MI</small></p>
-    <p class="card-text"></p>
-    <p class="card-text">Today she's been trying to stand on her own. It fills me up with such a sense of joy to see my little girl blossom before me.</p>
-    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-  </div>
-  <div class="card-footer" style="margin-bottom: 1%;">
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-    <div id="photos">
-      <div class="tb">
-        <div class="tr">
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-          <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')"></div>
-        </div>
-        
-      </div>
-    </div>
-  </div>
-
-</div> 
+<div id="all_memories"></div>
 
 </div>
 `;
 
 var chat_messages = [];
 var create_memory_images = [];
+
+var memories = [];
+
+
+walker_get_memories().then((result) => {
+
+
+  memories = result.report[0];
+
+  memories = [
+    {
+        "id": "ipsum62780",
+        "subject": " I'd like to document a memory.. Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?.",
+        "how": "happy",
+        "where": "florida",
+        "summary": " I'd like to document a memory.. I'd like to document a memory.. Hey Tobu it was my daughter's birthday yesterday and it was an awesome experience could you help me remember it?. We were in florida and we had an amazing time.",
+        "date": "2022-10-26",
+        "category": "birthday"
+    },
+    {
+        "id": "neque41126",
+        "subject": " I went to my son's soccer game in Miami yesterday .",
+        "how": "happy",
+        "where": "orland",
+        "summary": " I went to my son's soccer game in Miami yesterday . Luckily John was there to keep me company. oh my gosh nice catch change there i was in orland instead thanks.",
+        "date": "2022-10-26",
+        "category": "sport"
+    }
+];
+
+  console.log(memories);
+
+  for (let i = 0; i < memories.length; i++) {
+    console.log(memories[i]);
+    m_keys = Object.keys(memories[i]);
+
+    console.log(m_keys);
+
+    if (m_keys.includes("file_ids")){
+
+      walker_get_base64(memories[i]["file_ids"]).then((result) => {
+
+        console.log(result.report[0][0]['context']['base64']);
+
+
+        $("#all_memories").append(
+          `
+          <div class="card mb-3">
+          <img src="data:image/png;base64,"+ ${result.report[0][0]['context']['base64']}" class="card-img-top" alt="..." onclick='open_modal()'>
+          <div class="card-body">
+            <h5 class="card-title" style="margin-bottom: 0px;">${memories[i]["subject"]}</h5>
+            <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>${memories[i]["date"]}<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+            <p class="card-text"></p>
+            <p class="card-text">${memories[i]["summary"]}</p>
+            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+          </div>
+          <div class="card-footer" style="margin-bottom: 1%;">
+            <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
+            <div id="photos">
+              <div class="tb">
+                <div class="tr">
+                  <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
+                  <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
+                  <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+  
+        </div> 
+          `
+        );
+      
+      
+      }).catch(function (error) {
+          console.log(error);
+      });
+
+
+
+    }
+
+    else{
+      $("#all_memories").append(
+        `
+        <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title" style="margin-bottom: 0px;" onclick="open_modal()">${memories[i]["subject"]}</h5>
+          <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>${memories[i]["date"]}<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+          <p class="card-text"></p>
+          <p class="card-text">${memories[i]["summary"]}</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+        <div class="card-footer" style="margin-bottom: 1%;">
+          <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
+          <div id="photos">
+            <div class="tb">
+              <div class="tr">
+                <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
+                <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
+                <div class="td" style="background-image: url('./images/nexus_oct_2019.jpg')" onclick='open_modal()'></div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
+      </div> 
+        `
+      );
+    }
+    
+
+  }
+  
+
+
+}).catch(function (error) {
+    console.log(error);
+});
+
+
+
 
 walker_run_talk('talk', "I'd like to document a memory.").then((result) => {
 
@@ -433,6 +483,50 @@ function walker_run_upload(name, base64="") {
     ]
     }
   }
+  `;
+
+  return fetch(`${server}/js/walker_run`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `token ${token}`
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
+}
+
+function walker_get_memories() {
+
+  query = `
+  {
+    "name": "get_memories",
+    "ctx": {}
+  }
+  `;
+
+  return fetch(`${server}/js/walker_run`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `token ${token}`
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
+}
+
+function walker_get_base64(fild_id) {
+
+  query = `
+  {
+    "name": "get_file",
+    "ctx": {
+        "file_id": "${fild_id}"
+    }
+}
   `;
 
   return fetch(`${server}/js/walker_run`, {
