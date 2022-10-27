@@ -83,9 +83,9 @@ document.getElementById('app-interact').parentNode.innerHTML = `
         </div>
         <div class="modal-footer" style="padding-right: 10%">
         <!-- User input box -->
-            <span class="fa-stack fa-1x"><i id="mic-bg" class="fa fa-circle fa-stack-2x icon-background" style="margin-left: -13px; color: #ffffff;"></i><i id="mic-btn" class="fa fa-microphone fa-stack-1x" style="margin-left: -5px;" onclick="mic_click()"></i></span> 
+            <span class="fa-stack fa-1x"><i id="chat_mic-bg" class="fa fa-circle fa-stack-2x icon-background" style="margin-left: -13px; color: #ffffff;"></i><i id="chat_mic-btn" class="fa fa-microphone fa-stack-1x" style="margin-left: -5px;" onclick="chat_mic_click()"></i></span> 
             <input id="chatio__inputField" style="width: 950px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;" "="" type="text" name="msg" placeholder="describe your memory">
-            <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendButton()">Send</button></div>
+            <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="chat_sendButton()">Send</button></div>
         </div>
       </div>
     </div>
@@ -304,57 +304,56 @@ function readOutLoud(message){
   window.speechSynthesis.speak(speech);
 }
 
-// ----------------- Microphone --------------------------
-var inputField = document.getElementById('chatio__inputField');
 var speechRecognition = window.webkitSpeechRecognition
-var recognition = new speechRecognition()
-var textbox = $("#chatio__inputField")
-var content = ''
+// ----------------- Chat Microphone --------------------------
 
-recognition.continuous = true
-stat = true
+var chat_inputField = document.getElementById('chatio__inputField');
+var chat_recognition = new speechRecognition()
+var chat_textbox = $("#chatio__inputField")
+var chat_content = ''
 
-recognition.onstart = function(){
+chat_recognition.continuous = true
+chat_stat = true
+
+chat_recognition.onstart = function(){
     console.log("Recording start")
-    document.getElementById("mic-btn").style.color = "#ffffff";
-    document.getElementById("mic-bg").style.color = "#365d96";
+    document.getElementById("chat_mic-btn").style.color = "#ffffff";
+    document.getElementById("chat_mic-bg").style.color = "#365d96";
 }
 
-recognition.onend = function(){
+chat_recognition.onend = function(){
     console.log("Recording end")
-    sendButton()
-    let userHtml = '<p class="userText"><span>' + inputField.value + '</span></p>';
-    $("#chatbox").append(userHtml);
-    document.getElementById("mic-btn").style.color = "#000000";
-    document.getElementById("mic-bg").style.color = "#ffffff";
-    content = ''
-    textbox.val(content)
-    stat = true
+    chat_sendButton();
+    document.getElementById("chat_mic-btn").style.color = "#000000";
+    document.getElementById("chat_mic-bg").style.color = "#ffffff";
+    chat_content = ''
+    chat_textbox.val(chat_content)
+    chat_stat = true
 }
 
-recognition.onresult = function(event){
-    var current = event.resultIndex;
-    var transcript = event.results[current][0].transcript
-    content += transcript
-    textbox.val(content)
+chat_recognition.onresult = function(event){
+    var chat_current = event.resultIndex;
+    var chat_transcript = event.results[chat_current][0].transcript
+    chat_content += chat_transcript
+    chat_textbox.val(chat_content)
 }
 
-function mic_click(){
-  if(stat){
-      if(content.length){
-          content += ''
+function chat_mic_click(){
+  if(chat_stat){
+      if(chat_content.length){
+          chat_content += ''
       }
   
-      recognition.continuous = true
-      recognition.start()
-      stat = false   
+      chat_recognition.continuous = true
+      chat_recognition.start()
+      chat_stat = false   
   }
   else{
-      recognition.stop()
+      chat_recognition.stop()
   }
 }
 
-// ----------------- Microphone --------------------------
+// ----------------- Chat Microphone --------------------------
 
 function update_messages() {
   conv = "";
@@ -368,12 +367,12 @@ function update_messages() {
       conv = conv + new_message;
     }
     document.getElementById("chatbox").innerHTML = conv;
-    inputField.value = '';
+    chat_inputField.value = '';
 }
 
 
-function sendButton(){
-  var utterance = inputField.value;
+function chat_sendButton(){
+  var utterance = chat_inputField.value;
 
   if(utterance){
     chat_messages.push(["user", utterance]);
