@@ -60,7 +60,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
           <p class="modal-title" id="createMemoryModalLabel"> Capture a memory</p>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="display_memory_feed()"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body">
         <!-- <button type="button" class="btn btn-outline-secondary">Add Photo/Video</button> -->
@@ -138,6 +138,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 
 var chat_messages = [];
 var create_memory_images = [];
+var upload_ids = [];
 
 //fetches and renders memories in the feed area
 function display_memory_feed() {
@@ -157,7 +158,7 @@ function display_memory_feed() {
 function render_memories(memories) {
   
   //clear memory feed 
-  $("#all_memories").html();
+  $("#all_memories").html('');
 
   if(!memories) return;
 
@@ -254,12 +255,13 @@ function display_capture_modal() {
   //reset the conversation
   chat_messages = [];
   create_memory_images = [];
+  upload_ids = [];
 
   walker_yield_clear().then((result) => {
 
     $('#createMemoryModal').modal('show');
     
-    walker_run_talk('talk', "Document a memory").then((result) => {
+    walker_run_talk('talk', "Document a memory", upload_ids).then((result) => {
       chat_messages.push(["bot", result.report[0]['response']]);
       readOutLoud(result.report[0]['response']); 
 
@@ -299,9 +301,12 @@ function display_memory_modal(id) {
 
     $('#memoryModal_btn_delete').on('click',function(){
       walker_delete_memory(memory.id).then((result) => {
-        display_memory_feed();
         //close this modal
         $('#memoryModal').modal('hide');
+        setTimeout(function() {
+          display_memory_feed();
+        }, 1500);
+        
       }).catch(function(error) { console.log(error);});
     });
 
@@ -449,7 +454,7 @@ function chat_sendButton(){
 
     update_messages();
 
-    walker_run_talk('talk', utterance).then((result) => {
+    walker_run_talk('talk', utterance, upload_ids).then((result) => {
       chat_messages.push(["bot", result.report[0]['response']]);
       readOutLoud(result.report[0]['response']); 
 
@@ -486,6 +491,7 @@ function imageUploaded() {
         console.log(result.report[0][0]['context']['id']);
 
         if(create_memory_images.length > 0){
+          upload_ids = new Array(result.report[0][0]['context']['id']);
           document.getElementById("photos").style.display = "block";
         }
 
@@ -505,14 +511,23 @@ function imageUploaded() {
 
 
 
-function walker_run_talk(name, utterance="") {
+function walker_run_talk(name, utterance="", file_ids=[]) {
 
-  query = `
-  {
-    "name": "${name}",
-    "ctx": {"question": "${utterance}"}
-  }
-  `;
+  //if(file_ids.length > 0) {
+    query = `
+    {
+      "name": "${name}",
+      "ctx": {"question": "${utterance}", "file_ids":"${file_ids}"}
+    }
+    `;
+  // } else {
+  //   query = `
+  //   {
+  //     "name": "${name}",
+  //     "ctx": {"question": "${utterance}"}
+  //   }
+  //   `;
+  // }
 
   return fetch(`${server}/js/walker_run`, {
     method: 'POST',
