@@ -110,7 +110,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
       <div class="dropdown-menu">
         <a id="memoryModal_btn_narrate" class="dropdown-item" href="#">Narrate</a>
         <a class="dropdown-item" href="#">Edit</a>
-        <a class="dropdown-item" href="#">Delete</a>
+        <a id="memoryModal_btn_delete" class="dropdown-item" href="#">Delete</a>
       </div>
     </div>
     <h5 id="memoryModal_subject" class="card-title" style="margin-bottom: 0px;"></h5>
@@ -156,8 +156,10 @@ function display_memory_feed() {
 //takes an array of memories and renders memory posts in the memory feed.
 function render_memories(memories) {
   
-  //clear memory feed
-  $("#all_memories").text();
+  //clear memory feed 
+  $("#all_memories").html();
+
+  if(!memories) return;
 
   for (let i = 0; i < memories.length; i++) {
 
@@ -165,21 +167,19 @@ function render_memories(memories) {
 
     rendered_related_memories = ``;
 
-    if (m_keys.includes("releatedMemories")){
-      related_memories = memories[i]["releatedMemories"];
-      rendered_related_memories = render_related_memories(related_memories)
+    if (m_keys.includes("relatedMemories")){
+      related_memories = memories[i]["relatedMemories"];
+      rendered_related_memories = render_related_memories(related_memories);
     }
 
-    if (m_keys.includes("file_ids")){
+    if (m_keys.includes("file_ids")) {
 
-      walker_get_base64(memories[i]["file_ids"]).then((result) => {
-
-        console.log(result.report[0][0]['context']['base64']);
+      walker_get_file(memories[i]["file_ids"]).then((result) => {
 
         $("#all_memories").append(
           `
           <div class="card mb-3">
-          <img src="data:image/png;base64,"+ ${result.report[0][0]['context']['base64']}" class="card-img-top" alt="..." onclick='display_memory_modal(${memories[i]["id"]})'>
+          <img src="data:image/jpeg;base64,${result.report[0][0]['context']['base64']}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
           <div class="card-body">
             <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
             <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>${memories[i]["date"]}<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
@@ -232,7 +232,7 @@ function render_related_memories(related_memories) {
     output = `
     <div class="card-footer" style="margin-bottom: 1%;">
     <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-    <div id="photos">
+    <div class="related_memories">
       <div class="tb">
         <div class="tr">
           ${rm_output}
@@ -255,17 +255,20 @@ function display_capture_modal() {
   chat_messages = [];
   create_memory_images = [];
 
-  $('#createMemoryModal').modal('show');
+  walker_yield_clear().then((result) => {
 
-  walker_run_talk('talk', "Document a memory").then((result) => {
-    chat_messages.push(["bot", result.report[0]['response']]);
-    readOutLoud(result.report[0]['response']); 
+    $('#createMemoryModal').modal('show');
+    
+    walker_run_talk('talk', "Document a memory").then((result) => {
+      chat_messages.push(["bot", result.report[0]['response']]);
+      readOutLoud(result.report[0]['response']); 
 
-    update_messages();
-  }).catch(function (error) {
-      console.log(error);
-  });
+      update_messages();
+    }).catch(function (error) {
+        console.log(error);
+    });
   
+  }).catch(function(error) { console.log(error);});
 }
 
 //displays the detailed modal of the memory
@@ -273,20 +276,35 @@ function display_memory_modal(id) {
 
   memory = [];
   walker_get_memory(id).then((result) => {
-    console.log(result);
+
     memory = result.report[0];  
 
-    if(memory.file_ids && memory.file_ids.length > 0) $('#memoryModal_image').html(`<img src="data:image/png;base64,"+ ${memory.file_ids[0]['context']['base64']}" class="card-img-top" alt="...">`)
+    console.log(memory.file_ids);
+
+    if(memory.file_ids && memory.file_ids.length > 0) {
+      walker_get_file(memory.file_ids).then((result) => {
+          $('#memoryModal_image').html(`<img src="data:image/png;base64,${result["report"][0][0]['context']['base64']}" class="card-img-top" alt="...">`)
+      })
+    }
     $('#memoryModal_title').text(memory.date);
     $('#memoryModal_subject').text(memory.subject);
     $('#memoryModal_date').text(memory.date);
     $('#memoryModal_where').text(memory.where);
     $('#memoryModal_description').text(memory.description);
-    $('#memoryModal_related_memories').html(render_related_memories(memory.releatedMemories)); //Tim needs to spell this correctly
+    $('#memoryModal_related_memories').html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
 
     $('#memoryModal_btn_narrate').on('click',function(){
       readOutLoud(memory.summary);
     });
+
+    $('#memoryModal_btn_delete').on('click',function(){
+      walker_delete_memory(memory.id).then((result) => {
+        display_memory_feed();
+        //close this modal
+        $('#memoryModal').modal('hide');
+      }).catch(function(error) { console.log(error);});
+    });
+
     $('#memoryModal').modal('show');
     
   }).catch(function (error) {
@@ -508,6 +526,24 @@ function walker_run_talk(name, utterance="") {
   });
 }
 
+function walker_yield_clear() {
+
+  query = `
+  {}
+  `;
+
+  return fetch(`${server}/js/walker_yield_clear`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `token ${token}`
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
+}
+
 
 
 function walker_run_upload(name, base64="") {
@@ -522,6 +558,29 @@ function walker_run_upload(name, base64="") {
              "base64": "${base64}" 
         }
     ]
+    }
+  }
+  `;
+
+  return fetch(`${server}/js/walker_run`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `token ${token}`
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
+}
+
+function walker_get_file(file_id) {
+
+  query = `
+  {
+    "name": "get_file",
+    "ctx": {
+        "id": "${file_id}"
     }
   }
   `;
@@ -582,17 +641,13 @@ function walker_get_memory(id) {
   });
 }
 
-
-
-function walker_get_base64(fild_id) {
+function walker_delete_memory(id) {
 
   query = `
   {
-    "name": "get_file",
-    "ctx": {
-        "file_id": "${fild_id}"
-    }
-}
+    "name": "delete_memory",
+    "ctx": {"id":"${id}"}
+  }
   `;
 
   return fetch(`${server}/js/walker_run`, {
@@ -606,6 +661,30 @@ function walker_get_base64(fild_id) {
     return result.json();
   });
 }
+
+
+// function walker_get_base64(fild_id) {
+
+//   query = `
+//   {
+//     "name": "get_file",
+//     "ctx": {
+//         "file_id": "${fild_id}"
+//     }
+//   }
+//   `;
+
+//   return fetch(`${server}/js/walker_run`, {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Authorization': `token ${token}`
+//     },
+//     body: query,
+//   }).then(function (result) {
+//     return result.json();
+//   });
+// }
 
 
 display_memory_feed();
