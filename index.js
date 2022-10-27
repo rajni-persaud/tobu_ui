@@ -103,12 +103,12 @@ document.getElementById('app-interact').parentNode.innerHTML = `
       <div class="modal-body">
       
       <div class="card mb-3">
-  <img id="memoryModal_photo" src="./images/tobu_iconic_logo.jpg" class="card-img-top" alt="..." onclick='open_modal()'>
+  <div id="memoryModal_image"></div>
   <div class="card-body">
     <div style="display: inline;float: right;">
       <a type="text" class="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
       <div class="dropdown-menu">
-        <a class="dropdown-item" onclick="readOutLoud(say)">Narrate</a>
+        <a id="memoryModal_btn_narrate" class="dropdown-item" href="#">Narrate</a>
         <a class="dropdown-item" href="#">Edit</a>
         <a class="dropdown-item" href="#">Delete</a>
       </div>
@@ -121,26 +121,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
     <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
   </div>
 
-  <div id="memoryModal_related_memories" class="card-footer" style="margin-bottom: 1%;">
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-    <div id="photos">
-    
-      <div class="tb">
-        <div class="tr">
-          <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
-          <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
-          <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
-        </div>
-
-        <div class="tr">
-        <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
-        <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
-        <div class="td" style="background-image: url('./images/tobu_iconic_logo.jpg')"></div>
-      </div>
-
-      </div>
-    </div>
-  </div>
+  <div id="memoryModal_related_memories"></div>
 </div> 
       </div>
 
@@ -174,38 +155,19 @@ function display_memory_feed() {
 
 //takes an array of memories and renders memory posts in the memory feed.
 function render_memories(memories) {
+  
+  //clear memory feed
+  $("#all_memories").text();
 
   for (let i = 0; i < memories.length; i++) {
 
     m_keys = Object.keys(memories[i]);
 
+    rendered_related_memories = ``;
+
     if (m_keys.includes("releatedMemories")){
       related_memories = memories[i]["releatedMemories"];
-      r_memories = ``;
-
-      if(related_memories.length > 0) {
-        
-        for (let r = 0; r < related_memories.length; r++) {
-          r_memories = r_memories + `<div class="td" onclick="display_memory_modal('${related_memories[i]["id"]}')"></div>`;
-        }
-
-        card_footer = `
-        <div class="card-footer" style="margin-bottom: 1%;">
-        <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-        <div id="photos">
-          <div class="tb">
-            <div class="tr">
-              ${r_memories}
-            </div>
-            
-          </div>
-        </div>
-      </div>
-        `;
-      }
-      else{
-        card_footer = ``;
-      }
+      rendered_related_memories = render_related_memories(related_memories)
     }
 
     if (m_keys.includes("file_ids")){
@@ -225,7 +187,7 @@ function render_memories(memories) {
             <p class="card-text">${memories[i]["summary"]}</p>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
           </div>
-          ${card_footer}
+          ${rendered_related_memories}
 
         </div> 
           `
@@ -248,13 +210,42 @@ function render_memories(memories) {
           <p class="card-text">${memories[i]["summary"]}</p>
           <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
         </div>
-        ${card_footer}
+        ${rendered_related_memories}
 
       </div> 
         `
       );
     }
   }
+}
+
+function render_related_memories(related_memories) {
+  var output = ``;
+  var rm_output = ``;
+  
+  if(related_memories && related_memories.length > 0) {
+        
+    for (let r = 0; r < related_memories.length; r++) {
+      if(related_memories[r]["id"]) rm_output = rm_output + `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')"></div>`;
+    }
+
+    output = `
+    <div class="card-footer" style="margin-bottom: 1%;">
+    <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
+    <div id="photos">
+      <div class="tb">
+        <div class="tr">
+          ${rm_output}
+        </div>
+        
+      </div>
+    </div>
+  </div>
+    `;
+  }
+
+  return output;
+
 }
 
 //displays the capture a memory modal
@@ -275,14 +266,31 @@ function display_capture_modal() {
   
 }
 
+//displays the detailed modal of the memory
 function display_memory_modal(id) {
-  
-  $('#memoryModal_title').text('TThis is the title');
-  $('#memoryModal_subject').text('This is the subject');
-  $('#memoryModal_date').text('23 Oct, 2022');
-  $('#memoryModal_where').text('Ann Arbor, MI');
-  $('#memoryModal_description').text('This is the full description');
-  $('#memoryModal').modal('show');
+
+  memory = [];
+  walker_get_memory(id).then((result) => {
+    console.log(result);
+    memory = result.report[0];  
+
+    if(memory.file_ids && memory.file_ids.length > 0) $('#memoryModal_image').html(`<img src="data:image/png;base64,"+ ${memory.file_ids[0]['context']['base64']}" class="card-img-top" alt="...">`)
+    $('#memoryModal_title').text(memory.date);
+    $('#memoryModal_subject').text(memory.subject);
+    $('#memoryModal_date').text(memory.date);
+    $('#memoryModal_where').text(memory.where);
+    $('#memoryModal_description').text(memory.description);
+    $('#memoryModal_related_memories').html(render_related_memories(memory.releatedMemories)); //Tim needs to spell this correctly
+
+    $('#memoryModal_btn_narrate').on('click',function(){
+      readOutLoud(memory.summary);
+    });
+    $('#memoryModal').modal('show');
+    
+  }).catch(function (error) {
+    console.log(error);
+  });
+
 }
 
 
@@ -474,6 +482,27 @@ function walker_get_memories() {
   {
     "name": "get_memories",
     "ctx": {}
+  }
+  `;
+
+  return fetch(`${server}/js/walker_run`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `token ${token}`
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
+}
+
+function walker_get_memory(id) {
+
+  query = `
+  {
+    "name": "get_memory",
+    "ctx": {"id":"${id}"}
   }
   `;
 
