@@ -271,6 +271,8 @@ function ask_tobu(){
   setTimeout(function() {
     display_query_memories(query_inputField.value);
   }, 1500);
+  // clear query field after displaying feed 
+  query_inputField.value = '';
 }
 
 //displays the capture a memory modal
