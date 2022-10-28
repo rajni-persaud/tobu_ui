@@ -37,7 +37,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 
 
 <div class="modal fade" id="ask_tobu_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document" style="height: 18%;">
+  <div class="modal-dialog" role="document" style="height: 30%;">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Ask Tobu</h5>
@@ -47,7 +47,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
       <!-- User input box -->
       <span class="fa-stack fa-1x"><i id="query_mic-bg" class="fa fa-circle fa-stack-2x icon-background" style="margin-left: -10px; color: #ffffff;"></i><i id="query_mic-btn" class="fa fa-microphone fa-stack-1x" style="margin-left: -7px;" onclick="query_mic_click()"></i></span>
           <input id="query__inputField" style="width: 500px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;"" type="text" name="msg" placeholder="ask Tobu about your memories">
-          <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendButton()">Send</button></div>
+          <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="ask_tobu()">Send</button></div>
       </div>
     </div>
   </div>
@@ -154,6 +154,20 @@ function display_memory_feed() {
   });
 }
 
+//fetches and renders memories in the feed area based on a query
+function display_query_memories(question) {
+  var memories = [];
+  
+  walker_query_memories(question).then((result) => {
+    
+    memories = result.report[0]; 
+    render_memories(memories);
+
+  }).catch(function (error) {
+    console.log(error);
+  });
+}
+
 //takes an array of memories and renders memory posts in the memory feed.
 function render_memories(memories) {
   
@@ -247,6 +261,16 @@ function render_related_memories(related_memories) {
 
   return output;
 
+}
+
+function ask_tobu(){
+  // get input
+  var query_inputField = document.getElementById('query__inputField');
+  //close this modal
+  $('#ask_tobu_modal').modal('hide');
+  setTimeout(function() {
+    display_query_memories(query_inputField.value);
+  }, 1500);
 }
 
 //displays the capture a memory modal
@@ -396,7 +420,7 @@ query_recognition.onstart = function(){
 
 query_recognition.onend = function(){
     console.log("Recording end")
-    // chat_sendButton(); -- query send button function goes here
+    ask_tobu();
     document.getElementById("query_mic-btn").style.color = "#000000";
     document.getElementById("query_mic-bg").style.color = "#ffffff";
     query_content = ''
@@ -662,6 +686,27 @@ function walker_delete_memory(id) {
   {
     "name": "delete_memory",
     "ctx": {"id":"${id}"}
+  }
+  `;
+
+  return fetch(`${server}/js/walker_run`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `token ${token}`
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
+}
+
+function walker_query_memories(question) {
+
+  query = `
+  {
+    "name": "get_memories",
+    "ctx": {"question":"${question}"}
   }
   `;
 
