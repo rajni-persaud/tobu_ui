@@ -4,6 +4,15 @@ var walker = document.getElementById("app-interact").getAttribute('data-walkerna
 var token = document.getElementById("app-interact").getAttribute('data-token');
 var last_jid = null;
 
+// Javascript objects containing emotions. Each key has a value of type array. - [icon,]
+emotions = {
+  sad:["fa-frown-o", "blue"], 
+  happy:["fa-smile-o", "orange"], 
+  fear:["fa-frown-open", "green"], 
+  anger:["fa-angry", "red"], 
+  surprised:["fa-surprise", "yellow"]
+};
+
 //say = "Arianna is growing up so fast. Today she's been trying to stand on her own. It fills me up with such a sense of joy to see my little girl blossom before me.";
 
 
@@ -114,7 +123,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
       </div>
     </div>
     <h5 id="memoryModal_subject" class="card-title" style="margin-bottom: 0px;"></h5>
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span><span id="memoryModal_date">23 Oct, 2022</span><span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span><span id="memoryModal_where">Ann Arbor, MI</span></small></p>
+    <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions["happy"][0]}" style="color: ${emotions["happy"][1]};"></i></span><span id="memoryModal_date">23 Oct, 2022</span><span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span><span id="memoryModal_where">Ann Arbor, MI</span></small></p>
 
 <p class="card-text"></p>
     <p id="memoryModal_description" class="card-text"></p>
@@ -173,6 +182,7 @@ function render_memories(memories) {
   
   //clear memory feed 
   $("#all_memories").html('');
+  // console.log(memories);
 
   if(!memories) return;
 
@@ -197,7 +207,7 @@ function render_memories(memories) {
           <img src="data:image/jpeg;base64,${result.report[0][0]['context']['base64']}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
           <div class="card-body">
             <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-            <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>${memories[i]["date"]}<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions["happy"][0]}" style="color: ${emotions["happy"][1]};"></i></span>${memories[i]["date"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
             <p class="card-text"></p>
             <p class="card-text">${memories[i]["summary"]}</p>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
@@ -220,7 +230,7 @@ function render_memories(memories) {
         <div class="card mb-3">
         <div class="card-body">
           <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-          <p class="card-text"><small class="text-muted"><span><i class="fa fa-smile-o" style="color: orange;"></i></span>${memories[i]["date"]}<span><i class="fa fa-map-marker" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+          <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions["happy"][0]}" style="color: ${emotions["happy"][1]};"></i></span>${memories[i]["date"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
           <p class="card-text"></p>
           <p class="card-text">${memories[i]["summary"]}</p>
           <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
