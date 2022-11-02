@@ -149,11 +149,14 @@ var chat_messages = [];
 var create_memory_images = [];
 var upload_ids = [];
 
+// get input from query field
+var query_inputField = document.getElementById('query__inputField');
+
 //fetches and renders memories in the feed area
 function display_memory_feed() {
   var memories = [];
   
-  walker_get_memories().then((result) => {
+  walker_get_memories(query_inputField.value).then((result) => {
     
     memories = result.report[0];  
     render_memories(memories);
@@ -164,18 +167,18 @@ function display_memory_feed() {
 }
 
 //fetches and renders memories in the feed area based on a query
-function display_query_memories(question) {
-  var memories = [];
+// function display_query_memories(question) {
+//   var memories = [];
   
-  walker_query_memories(question).then((result) => {
+//   walker_query_memories(question).then((result) => {
     
-    memories = result.report[0]; 
-    render_memories(memories);
+//     memories = result.report[0]; 
+//     render_memories(memories);
 
-  }).catch(function (error) {
-    console.log(error);
-  });
-}
+//   }).catch(function (error) {
+//     console.log(error);
+//   });
+// }
 
 //takes an array of memories and renders memory posts in the memory feed.
 function render_memories(memories) {
@@ -207,7 +210,7 @@ function render_memories(memories) {
           <img src="data:image/jpeg;base64,${result.report[0][0]['context']['base64']}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
           <div class="card-body">
             <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions["happy"][0]}" style="color: ${emotions["happy"][1]};"></i></span>${memories[i]["date"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions["happy"][1]};"></i></span>${memories[i]["date"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
             <p class="card-text"></p>
             <p class="card-text">${memories[i]["summary"]}</p>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
@@ -230,7 +233,7 @@ function render_memories(memories) {
         <div class="card mb-3">
         <div class="card-body">
           <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-          <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions["happy"][0]}" style="color: ${emotions["happy"][1]};"></i></span>${memories[i]["date"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+          <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["date"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
           <p class="card-text"></p>
           <p class="card-text">${memories[i]["summary"]}</p>
           <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
@@ -278,9 +281,7 @@ function ask_tobu(){
   var query_inputField = document.getElementById('query__inputField');
   //close this modal
   $('#ask_tobu_modal').modal('hide');
-  setTimeout(function() {
-    display_query_memories(query_inputField.value);
-  }, 1500);
+      display_memory_feed();
   // clear query field after displaying feed 
   query_inputField.value = '';
 }
@@ -650,7 +651,7 @@ function walker_get_file(file_id) {
 
 
 
-function walker_get_memories() {
+function walker_get_memories(question="") {
 
   query = `
   {
@@ -658,6 +659,17 @@ function walker_get_memories() {
     "ctx": {}
   }
   `;
+
+  if (question){
+    query = `
+    {
+      "name": "get_memories",
+      "ctx": {
+          "question": "${question}"
+      }
+  }
+    `;
+  }
 
   return fetch(`${server}/js/walker_run`, {
     method: 'POST',
@@ -713,26 +725,26 @@ function walker_delete_memory(id) {
   });
 }
 
-function walker_query_memories(question) {
+// function walker_query_memories(question) {
 
-  query = `
-  {
-    "name": "get_memories",
-    "ctx": {"question":"${question}"}
-  }
-  `;
+//   query = `
+//   {
+//     "name": "get_memories",
+//     "ctx": {"question":"${question}"}
+//   }
+//   `;
 
-  return fetch(`${server}/js/walker_run`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `token ${token}`
-    },
-    body: query,
-  }).then(function (result) {
-    return result.json();
-  });
-}
+//   return fetch(`${server}/js/walker_run`, {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Authorization': `token ${token}`
+//     },
+//     body: query,
+//   }).then(function (result) {
+//     return result.json();
+//   });
+// }
 
 
 // function walker_get_base64(fild_id) {
