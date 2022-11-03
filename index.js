@@ -110,28 +110,41 @@ document.getElementById('app-interact').parentNode.innerHTML = `
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
-      
-      <div class="card mb-3">
-  <div id="memoryModal_image"></div>
-  <div class="card-body">
-    <div style="display: inline;float: right;">
-      <a type="text" class="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
-      <div class="dropdown-menu">
-        <a id="memoryModal_btn_narrate" class="dropdown-item" href="#">Narrate</a>
-        <a class="dropdown-item" href="#">Edit</a>
-        <a id="memoryModal_btn_delete" class="dropdown-item" href="#">Delete</a>
-      </div>
-    </div>
-    <h5 id="memoryModal_subject" class="card-title" style="margin-bottom: 0px;"></h5>
-    <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions["happy"][0]}" style="color: ${emotions["happy"][1]};"></i></span><span id="memoryModal_date">23 Oct, 2022</span><span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span><span id="memoryModal_where">Ann Arbor, MI</span></small></p>
+        <div id="memoryModal_details">
+          <div class="card mb-3">
+            <div id="memoryModal_image"></div>
+            <div class="card-body">
+              <div style="display: inline;float: right;">
+                <a type="text" class="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
+                <div class="dropdown-menu">
+                  <a id="memoryModal_btn_narrate" class="dropdown-item" href="#">Narrate</a>
+                  <a id="memoryModal_btn_edit" class="dropdown-item" href="#">Edit</a>
+                  <a id="memoryModal_btn_delete" class="dropdown-item" href="#">Delete</a>
+                </div>
+              </div>
+              <h5 id="memoryModal_subject" class="card-title" style="margin-bottom: 0px;"></h5>
+              <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions["happy"][0]}" style="color: ${emotions["happy"][1]};"></i></span><span id="memoryModal_date">23 Oct, 2022</span><span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span><span id="memoryModal_where">Ann Arbor, MI</span></small></p>
 
-<p class="card-text"></p>
-    <p id="memoryModal_description" class="card-text"></p>
-    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-  </div>
-
-  <div id="memoryModal_related_memories"></div>
-</div> 
+              <p class="card-text"></p>
+              <p id="memoryModal_description" class="card-text"></p>
+              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            </div>
+            <div id="memoryModal_related_memories"></div>
+          </div>
+        </div>
+        <div id="memoryModal_edit" style="display: none">
+          <form>
+            <div class="form-group">
+              <label for="memory_subject">Subject</label>
+              <input type="text" class="form-control" id="memory_subject" placeholder="Subject">
+            </div>
+            <div class="form-group">
+              <label for="memory_description">Description</label>
+              <textarea class="form-control" id="memory_description" rows="3"></textarea>
+            </div>
+          </form>
+          <button class="btn btn-primary" onclick="save_memory_details()"><i class="fa fa-check-circle" aria-hidden="true"></i>Save Changes</button>
+        </div>
       </div>
 
     </div>
@@ -336,6 +349,14 @@ function display_memory_modal(id) {
       readOutLoud(memory.summary);
     });
 
+    $('#memoryModal_btn_edit').on('click',function(){
+      $('#memoryModal_title').text("Edit Memory");
+      document.getElementById("memory_subject").value = memory.subject;
+      document.getElementById("memory_description").value = memory.description;
+      document.getElementById("memoryModal_edit").style.display = "block";
+      document.getElementById("memoryModal_details").style.display = "none";
+    });
+
     $('#memoryModal_btn_delete').on('click',function(){
       walker_delete_memory(memory.id).then((result) => {
         //close this modal
@@ -355,6 +376,11 @@ function display_memory_modal(id) {
 
 }
 
+function save_memory_details(){
+  $('#memoryModal_title').text(memory.date);
+  document.getElementById("memoryModal_edit").style.display = "none";
+  document.getElementById("memoryModal_details").style.display = "block";
+}
 
 function readOutLoud(message){
   speech = new SpeechSynthesisUtterance(message);
