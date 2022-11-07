@@ -195,7 +195,8 @@ function display_memory_feed() {
 
 //takes an array of memories and renders memory posts in the memory feed.
 function render_memories(memories) {
-  
+
+  var imageData = null;
   //clear memory feed 
   $("#all_memories").html('');
   // console.log(memories);
@@ -203,24 +204,27 @@ function render_memories(memories) {
   if(!memories) return;
 
   for (let i = 0; i < memories.length; i++) {
-
+   
     m_keys = Object.keys(memories[i]);
 
     rendered_related_memories = ``;
 
-    if (m_keys.includes("relatedMemories")){
+    if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
       related_memories = memories[i]["relatedMemories"];
       rendered_related_memories = render_related_memories(related_memories);
     }
 
-    if (m_keys.includes("file_ids")) {
-
+    if (m_keys.includes("file_ids") && memories[i]["file_ids"][0] != null) {
+      imageData = null;
+      
       walker_get_file(memories[i]["file_ids"]).then((result) => {
-
+        imageData = result.report[0][0]['context']['base64'];
+        
+        if(imageData) {
         $("#all_memories").append(
           `
           <div class="card mb-3">
-          <img src="data:image/jpeg;base64,${result.report[0][0]['context']['base64']}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
+          <img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
           <div class="card-body">
             <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
             <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions["happy"][1]};"></i></span>${memories[i]["date"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
@@ -233,6 +237,23 @@ function render_memories(memories) {
         </div> 
           `
         );
+        } else {
+          $("#all_memories").append(
+            `
+            <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
+              <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["date"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+              <p class="card-text"></p>
+              <p class="card-text">${memories[i]["summary"]}</p>
+              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            </div>
+            ${rendered_related_memories}
+    
+          </div> 
+            `
+          );
+        }
       
       
       }).catch(function (error) {
@@ -334,9 +355,13 @@ function display_memory_modal(id) {
     console.log(memory.file_ids);
 
     if(memory.file_ids && memory.file_ids.length > 0) {
-      walker_get_file(memory.file_ids).then((result) => {
-          $('#memoryModal_image').html(`<img src="data:image/png;base64,${result["report"][0][0]['context']['base64']}" class="card-img-top" alt="...">`)
-      })
+      if(memory.file_ids[0]) {
+        walker_get_file(memory.file_ids).then((result) => {
+            $('#memoryModal_image').html(`<img src="data:image/png;base64,${result["report"][0][0]['context']['base64']}" class="card-img-top" alt="...">`)
+        })
+      }
+    } else {
+      $('#memoryModal_image').html(' ');
     }
     $('#memoryModal_title').text(memory.date);
     $('#memoryModal_subject').text(memory.subject);
@@ -654,25 +679,28 @@ function walker_run_upload(name, base64="") {
 
 function walker_get_file(file_id) {
 
-  query = `
-  {
-    "name": "get_file",
-    "ctx": {
-        "id": "${file_id}"
+  if(file_id) {
+    query = `
+    {
+      "name": "get_file",
+      "ctx": {
+          "id": "${file_id}"
+      }
     }
+    `;
+    
+    
+    return fetch(`${server}/js/walker_run`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `token ${token}`
+      },
+      body: query,
+    }).then(function (result) {
+      return result.json();
+    });
   }
-  `;
-
-  return fetch(`${server}/js/walker_run`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `token ${token}`
-    },
-    body: query,
-  }).then(function (result) {
-    return result.json();
-  });
 }
 
 
