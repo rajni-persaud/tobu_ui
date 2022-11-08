@@ -138,10 +138,10 @@ document.getElementById('app-interact').parentNode.innerHTML = `
               <label for="memory_subject">Subject</label>
               <input type="text" class="form-control" id="memory_subject" placeholder="Subject">
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
               <label for="memory_category">Category</label>
               <input type="text" class="form-control" id="memory_category" placeholder="Category">
-            </div>
+            </div> -->
             <div class="form-group">
               <label for="memory_when">When</label>
               <input type="text" class="form-control" id="memory_when" placeholder="When did this happen?">
@@ -393,7 +393,7 @@ function display_memory_modal(id) {
     $('#memoryModal_btn_edit').on('click',function(){
       $('#memoryModal_title').text("Edit Memory");
       document.getElementById("memory_subject").value = memory.subject;
-      document.getElementById("memory_category").value = memory.category;
+      // document.getElementById("memory_category").value = memory.category;
       document.getElementById("memory_description").value = memory.description;
       document.getElementById("memory_summary").value = memory.summary;
       document.getElementById("memory_when").value = memory.when;
@@ -809,7 +809,6 @@ function walker_update_memory(id) {
     "ctx": {
       "id":"${id}",
       "subject": "${document.getElementById('memory_subject').value}",
-      "category": "${document.getElementById('memory_category').value}",
       "summary": "${document.getElementById('memory_summary').value}",
       "description": "${document.getElementById('memory_description').value}",
       "when": "${document.getElementById('memory_when').value}",
