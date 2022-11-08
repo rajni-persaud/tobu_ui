@@ -808,12 +808,12 @@ function walker_update_memory(id) {
     "name": "update_memory",
     "ctx": {
       "id":"${id}",
-      "subject": "test_subject",
-      "category": "test_category",
-      "summary": "test_summary",
-      "description": "test_description",
-      "when": "2022-11-08",
-      "where": "test_where"
+      "subject": "${document.getElementById('memory_subject').value}",
+      "category": "${document.getElementById('memory_category').value}",
+      "summary": "${document.getElementById('memory_summary').value}",
+      "description": "${document.getElementById('memory_description').value}",
+      "when": "${document.getElementById('memory_when').value}",
+      "where": "${document.getElementById('memory_where').value}"
     }
   }
   `;
