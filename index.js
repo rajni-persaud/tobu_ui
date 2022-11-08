@@ -408,6 +408,8 @@ function display_memory_modal(id) {
 
 function save_memory_details(){
   $('#memoryModal_title').text(memory.date);
+  console.log(memory.id);
+  walker_update_memory(memory.id);
   document.getElementById("memoryModal_edit").style.display = "none";
   document.getElementById("memoryModal_details").style.display = "block";
 }
@@ -769,6 +771,35 @@ function walker_delete_memory(id) {
   {
     "name": "delete_memory",
     "ctx": {"id":"${id}"}
+  }
+  `;
+
+  return fetch(`${server}/js/walker_run`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `token ${token}`
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
+}
+
+function walker_update_memory(id) {
+
+  query = `
+  {
+    "name": "update_memory",
+    "ctx": {
+      "id":"${id}",
+      "subject": "test_subject",
+      "category": "test_category",
+      "summary": "test_summary",
+      "description": "test_description",
+      "when": "2022-11-08",
+      "where": "test_where"
+    }
   }
   `;
 
