@@ -253,7 +253,7 @@ function render_memories(memories) {
           <img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
           <div class="card-body">
             <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["date_created"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
             <p class="card-text"></p>
             <p class="card-text">${memories[i]["summary"]}</p>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
@@ -269,7 +269,7 @@ function render_memories(memories) {
             <div class="card mb-3">
             <div class="card-body">
               <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-              <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["date_created"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+              <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
               <p class="card-text"></p>
               <p class="card-text">${memories[i]["summary"]}</p>
               <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
@@ -293,7 +293,7 @@ function render_memories(memories) {
         <div class="card mb-3">
         <div class="card-body">
           <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-          <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["date_created"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+          <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
           <p class="card-text"></p>
           <p class="card-text">${memories[i]["summary"]}</p>
           <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
