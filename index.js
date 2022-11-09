@@ -15,6 +15,12 @@ emotions = {
 
 //say = "Arianna is growing up so fast. Today she's been trying to stand on her own. It fills me up with such a sense of joy to see my little girl blossom before me.";
 
+// list of emotions to be used in select list
+emotions_select_values = Object.keys(emotions);
+emotion_select_options = ``;
+  for (i=0; i<emotions_select_values.length; i++){
+    emotion_select_options = emotion_select_options + `<option value="${emotions_select_values[i]}">${emotions_select_values[i]}</option>`;
+  }
 
 // // Replace the script tag with the app
 document.getElementById('app-interact').parentNode.innerHTML = `
@@ -149,6 +155,10 @@ document.getElementById('app-interact').parentNode.innerHTML = `
             <div class="form-group">
               <label for="memory_where">Where</label>
               <input type="text" class="form-control" id="memory_where" placeholder="Where did this happen?">
+            </div>
+            <div class="form-group">
+              <label for="memory_how">How:</label>
+              <select class="form-control" id="memory_how">${emotion_select_options}</select>
             </div>
             <div class="form-group">
               <label for="memory_description">Description</label>
@@ -400,6 +410,7 @@ function display_memory_modal(id) {
       document.getElementById("memory_summary").value = memory.summary;
       document.getElementById("memory_when").value = memory.when;
       document.getElementById("memory_where").value = memory.where;
+      document.getElementById("memory_how").value = memory.how;
       document.getElementById("memoryModal_edit").style.display = "block";
       document.getElementById("memoryModal_details").style.display = "none";
     });
