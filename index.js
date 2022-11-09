@@ -829,7 +829,8 @@ function walker_update_memory(id) {
       "summary": "${document.getElementById('memory_summary').value}",
       "description": "${document.getElementById('memory_description').value}",
       "when": "${document.getElementById('memory_when').value}",
-      "where": "${document.getElementById('memory_where').value}"
+      "where": "${document.getElementById('memory_where').value}",
+      "how": "${document.getElementById('memory_how').value}"
     }
   }
   `;
