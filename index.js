@@ -162,6 +162,10 @@ document.getElementById('app-interact').parentNode.innerHTML = `
               <select class="form-control" id="memory_how">${emotion_select_options}</select>
             </div>
             <div class="form-group">
+              <label for="memory_who">Who:</label>  
+              <input type="text" class="form-control" name="memory_who">
+            </div>
+            <div class="form-group">
               <label for="memory_description">Description</label>
               <textarea class="form-control" id="memory_description" rows="3"></textarea>
             </div>
@@ -401,6 +405,7 @@ function display_memory_modal(id) {
       $('#memoryModal_image').html(' ');
     }
 
+    console.log(memory.id);
     $('#memoryModal_title').text(memory.when);
     $('#memoryModal_subject').text(memory.subject);
     $('#memoryModal_date').text(memory.when);
@@ -410,12 +415,19 @@ function display_memory_modal(id) {
     $('#memoryModal_lastUpdated').text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
     $('#memoryModal_related_memories').html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
 
+    persons = [];
+    for (let p = 0; p < memory.who.length; p++) {
+      persons.push(memory.who[p]['context']['name']);
+    }
     $('#memoryModal_btn_narrate').on('click',function(){
       readOutLoud(memory.summary);
     });
 
     $('#memoryModal_btn_edit').on('click',function(){
       $('#memoryModal_title').text("Edit Memory");
+      $('input[name="memory_who"]').amsifySuggestags({
+        suggestions: persons,
+         });
       document.getElementById("memory_subject").value = memory.subject;
       // document.getElementById("memory_category").value = memory.category;
       document.getElementById("memory_description").value = memory.description;
@@ -462,8 +474,8 @@ function close_edit_modal(){
 }
 
 function save_memory_details(){
-  //console.log(memory.id);
   walker_update_memory(memory.id);
+  console.log(who_selected);
   close_edit_modal();
 }
 
