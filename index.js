@@ -139,6 +139,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
           </div>
         </div>
         <div id="memoryModal_edit" style="display: none">
+          <div id="edit_photos"></div>
           <form>
             <div class="form-group">
               <label for="memory_subject">Subject</label>
@@ -374,6 +375,7 @@ function display_capture_modal() {
 function display_memory_modal(id) {
 
   memory = [];
+  memory_display_photos = [];
   walker_get_memory(id).then((result) => {
 
     memory = result.report[0];  
@@ -386,9 +388,19 @@ function display_memory_modal(id) {
             $('#memoryModal_image').html(`<img src="data:image/png;base64,${result["report"][0][0]['context']['base64']}" class="card-img-top" alt="...">`)
         })
       }
+      
+      for (let p = 0; p < memory.file_ids.length; p++) {
+        console.log(memory.file_ids[p]);
+        walker_get_file(memory.file_ids[p]).then((result) => {
+          memory_display_photos.push(result["report"][0][0]['context']['base64']);
+          display_memory_photos(memory.file_ids[p], memory_display_photos);
+        })
+      }
+
     } else {
       $('#memoryModal_image').html(' ');
     }
+
     $('#memoryModal_title').text(memory.when);
     $('#memoryModal_subject').text(memory.subject);
     $('#memoryModal_date').text(memory.when);
@@ -432,6 +444,15 @@ function display_memory_modal(id) {
     console.log(error);
   });
 
+}
+
+function display_memory_photos(memory_file_ids, memory_photos){
+  d_memory_photos = ``;
+  for (let ph = 0; ph < memory_photos.length; ph++) {
+    d_memory_photos = d_memory_photos + `<div><i class="fas fa-times" style="padding-right: 20px; margin-bottom: 10px;"></i><img src="data:image/png;base64,${memory_photos[ph]}" style="height: 200px;"></div>`;
+    // display photos above edit form
+    $('#edit_photos').html(`<div class="tb"><div class="tr">${d_memory_photos}</div></div>`);
+  }
 }
 
 function close_edit_modal(){
