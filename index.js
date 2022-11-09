@@ -107,7 +107,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
     <div class="modal-content">
       <div class="modal-header">
         <p class="modal-title" id="memoryModal_title"></p>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="close_edit_modal()"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
         <div id="memoryModal_details">
@@ -123,11 +123,11 @@ document.getElementById('app-interact').parentNode.innerHTML = `
                 </div>
               </div>
               <h5 id="memoryModal_subject" class="card-title" style="margin-bottom: 0px;"></h5>
-              <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions["happy"][0]}" style="color: ${emotions["happy"][1]};"></i></span><span id="memoryModal_date">23 Oct, 2022</span><span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span><span id="memoryModal_where">Ann Arbor, MI</span></small></p>
+              <p class="card-text"><small class="text-muted"><span id="memoryModal_how"></span><span id="memoryModal_date"></span><span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span><span id="memoryModal_where"></span></small></p>
 
               <p class="card-text"></p>
               <p id="memoryModal_description" class="card-text"></p>
-              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+              <p class="card-text"><small class="text-muted"><span id="memoryModal_lastUpdated"></span></small></p>
             </div>
             <div id="memoryModal_related_memories"></div>
           </div>
@@ -379,11 +379,13 @@ function display_memory_modal(id) {
     } else {
       $('#memoryModal_image').html(' ');
     }
-    $('#memoryModal_title').text(memory.date);
+    $('#memoryModal_title').text(memory.when);
     $('#memoryModal_subject').text(memory.subject);
-    $('#memoryModal_date').text(memory.date);
+    $('#memoryModal_date').text(memory.when);
     $('#memoryModal_where').text(memory.where);
     $('#memoryModal_description').text(memory.description);
+    $('#memoryModal_how').html(`<i class="fa ${emotions[memory.how][0]}" style="color: ${emotions[memory.how][1]};"></i>`);
+    $('#memoryModal_lastUpdated').text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
     $('#memoryModal_related_memories').html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
 
     $('#memoryModal_btn_narrate').on('click',function(){
@@ -421,12 +423,16 @@ function display_memory_modal(id) {
 
 }
 
-function save_memory_details(){
-  $('#memoryModal_title').text(memory.date);
-  console.log(memory.id);
-  walker_update_memory(memory.id);
+function close_edit_modal(){
   document.getElementById("memoryModal_edit").style.display = "none";
   document.getElementById("memoryModal_details").style.display = "block";
+  $('#memoryModal_title').text(memory.when);
+}
+
+function save_memory_details(){
+  //console.log(memory.id);
+  walker_update_memory(memory.id);
+  close_edit_modal();
 }
 
 function readOutLoud(message){
