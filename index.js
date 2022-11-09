@@ -135,7 +135,6 @@ document.getElementById('app-interact').parentNode.innerHTML = `
               <p id="memoryModal_description" class="card-text"></p>
               <p class="card-text"><small class="text-muted"><span id="memoryModal_lastUpdated"></span></small></p>
             </div>
-            <div id="memoryModal_related_memories"></div>
           </div>
         </div>
         <div id="memoryModal_edit" style="display: none">
@@ -263,7 +262,6 @@ function render_memories(memories) {
             <p class="card-text">${memories[i]["summary"]}</p>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
           </div>
-          ${rendered_related_memories}
 
         </div> 
           `
@@ -279,7 +277,6 @@ function render_memories(memories) {
               <p class="card-text">${memories[i]["summary"]}</p>
               <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
             </div>
-            ${rendered_related_memories}
     
           </div> 
             `
@@ -303,7 +300,6 @@ function render_memories(memories) {
           <p class="card-text">${memories[i]["summary"]}</p>
           <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
         </div>
-        ${rendered_related_memories}
 
       </div> 
         `
