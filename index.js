@@ -223,6 +223,15 @@ function display_memory_feed() {
 //   });
 // }
 
+function isValidTimestamp(_timestamp) {
+  const newTimestamp = new Date(_timestamp).getTime();
+  return isNumeric(newTimestamp);
+}
+
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 //takes an array of memories and renders memory posts in the memory feed.
 function render_memories(memories) {
 
@@ -234,6 +243,25 @@ function render_memories(memories) {
   if(!memories) return;
 
   for (let i = 0; i < memories.length; i++) {
+
+    memory_subject = memories[i]["subject"];
+    memory_description = memories[i]["description"];
+    memory_summary = memories[i]["summary"];
+    memory_where = memories[i]["where"];
+    memory_when = memories[i]["when"];
+    memory_date_created = memories[i]["date_created"];
+    memory_date_modified = memories[i]["date_modified"];
+
+    memory_subject = memory_subject === null ? "Subject N/A" : memory_subject;
+    memory_description = memory_description === null ? "Description N/A" : memory_description;
+    memory_summary = memory_summary === null ? "Summary N/A" : memory_summary;
+    memory_where = memory_where === null ? "Unknown Location" : memory_where;
+    memory_when = memory_when === null ? "Date Unknown" : memory_when;
+    memory_date_created = memory_date_created === null ? memory_when : memory_date_created;
+    memory_date_modified = memory_date_modified === null ? memory_date_created : memory_date_modified;
+
+    memory_date_created = isValidTimestamp(memory_date_created) ? memory_date_created.replace("T", " ").substring(0, memory_date_created.lastIndexOf(".")): memory_date_created;
+    memory_date_modified = isValidTimestamp(memory_date_modified) ? memory_date_modified.replace("T", " ").substring(0, memory_date_modified.lastIndexOf(".")): memory_date_modified;
    
     m_keys = Object.keys(memories[i]);
 
@@ -256,11 +284,11 @@ function render_memories(memories) {
           <div class="card mb-3">
           <img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
           <div class="card-body">
-            <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+            <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memory_subject}</a></h5>
+            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memory_where}</small></p>
             <p class="card-text"></p>
-            <p class="card-text">${memories[i]["summary"]}</p>
-            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            <p class="card-text">${memory_summary}</p>
+            <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
           </div>
 
         </div> 
@@ -271,11 +299,11 @@ function render_memories(memories) {
             `
             <div class="card mb-3">
             <div class="card-body">
-              <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-              <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+              <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memory_subject}</a></h5>
+              <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memory_where}</small></p>
               <p class="card-text"></p>
-              <p class="card-text">${memories[i]["summary"]}</p>
-              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+              <p class="card-text">${memory_summary}</p>
+              <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
             </div>
     
           </div> 
@@ -294,11 +322,11 @@ function render_memories(memories) {
         `
         <div class="card mb-3">
         <div class="card-body">
-          <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-          <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+          <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memory_subject}</a></h5>
+          <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memory_where}</small></p>
           <p class="card-text"></p>
-          <p class="card-text">${memories[i]["summary"]}</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+          <p class="card-text">${memory_summary}</p>
+          <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
         </div>
 
       </div> 
