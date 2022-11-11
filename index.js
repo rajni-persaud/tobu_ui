@@ -502,13 +502,16 @@ function display_memory_photos(memory_file_ids, memory_photos){
 function close_edit_modal(){
   document.getElementById("memoryModal_edit").style.display = "none";
   document.getElementById("memoryModal_details").style.display = "block";
-  $('#memoryModal_title').text(memory.when);
+  $('#memoryModal').modal('hide');
+  display_memory_feed();
 }
 
 function save_memory_details(){
   walker_update_memory(memory.id);
   console.log(who_selected);
-  close_edit_modal();
+  setTimeout(function() {
+    close_edit_modal();
+  }, 1500);
 }
 
 function readOutLoud(message){
