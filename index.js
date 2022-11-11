@@ -192,6 +192,8 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 var chat_messages = [];
 var create_memory_images = [];
 var upload_ids = [];
+var extension = "";
+var file_upload = false;
 
 // get input from query field
 var query_inputField = document.getElementById('query__inputField');
@@ -402,7 +404,7 @@ function display_capture_modal() {
 
     $('#createMemoryModal').modal('show');
     
-    walker_run_talk('talk', "Document a memory", upload_ids).then((result) => {
+    walker_run_talk('talk', "Document a memory", upload_ids, extension).then((result) => {
       chat_messages.push(["bot", result.report[0]['response']]);
       readOutLoud(result.report[0]['response']); 
 
@@ -419,6 +421,7 @@ function display_memory_modal(id) {
 
   memory = [];
   memory_display_photos = [];
+  file_upload = false;
   walker_get_memory(id).then((result) => {
 
     memory = result.report[0];  
@@ -661,7 +664,7 @@ function chat_sendButton(){
 
     update_messages();
 
-    walker_run_talk('talk', utterance, upload_ids).then((result) => {
+    walker_run_talk('talk', utterance, upload_ids, extension).then((result) => {
       chat_messages.push(["bot", result.report[0]['response']]);
       readOutLoud(result.report[0]['response']); 
 
@@ -678,10 +681,13 @@ function chat_sendButton(){
 function imageUploaded() {
 
   var base64String = "";
-  let file_name = "";
 
   var file = document.querySelector(
       'input[type=file]')['files'][0];
+
+  file_upload = true;
+
+  extension = file.name;
 
   var reader = new FileReader();
     
@@ -693,7 +699,7 @@ function imageUploaded() {
       console.log(create_memory_images);
       // console.log(base64String);
 
-      walker_run_upload(Date.now(), base64String).then((result) => {
+      walker_run_upload(extension, base64String).then((result) => {
 
         console.log(result.report[0][0]['context']['id']);
 
@@ -718,19 +724,30 @@ function imageUploaded() {
 
 
 
-function walker_run_talk(name, utterance="", file_ids=[]) {
+function walker_run_talk(name, utterance="", file_ids=[], file_name="") {
 
   //if(file_ids.length > 0) {
     query = `
     {
       "name": "${name}",
       "ctx": {
-        "question": "${utterance}", 
-        "file_ids":"${file_ids}",
-
+        "question": "${utterance}"
       }
     }
     `;
+    if(file_upload){
+
+      query = `
+    {
+      "name": "${name}",
+      "ctx": {
+        "question": "${utterance}", 
+        "file_ids": "${file_ids}",
+        "file_name": "${file_name}"
+      }
+    }
+    `;
+    }
   // } else {
   //   query = `
   //   {
