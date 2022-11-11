@@ -343,11 +343,21 @@ function render_memories(memories) {
 function render_related_memories(related_memories) {
   var output = ``;
   var rm_output = ``;
+  var rm_content = ``;
   
   if(related_memories && related_memories.length > 0) {
         
     for (let r = 0; r < related_memories.length; r++) {
-      if(related_memories[r]["id"]) rm_output = rm_output + `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')"></div>`;
+      // if (image){
+      //   rm_content = `<div class="td" style="background-image: url('[image_url]')"></div>`;
+      // }
+      // else{
+      //   rm_content = `${related_memories[r]["subject"]}`;
+      // }
+
+      rm_content = related_memories[r]["subject"];
+
+      if(related_memories[r]["id"]) rm_output = rm_output + `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_content}</div>`;
     }
 
     output = `
