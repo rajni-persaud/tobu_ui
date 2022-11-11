@@ -282,6 +282,7 @@ function render_memories(memories) {
       walker_get_file(memories[i]["file_ids"]).then((result) => {
         imageData = result.report[0][0]['context']['base64'];
         
+        
         if(imageData) {
         $("#all_memories").append(
           `
@@ -723,7 +724,11 @@ function walker_run_talk(name, utterance="", file_ids=[]) {
     query = `
     {
       "name": "${name}",
-      "ctx": {"question": "${utterance}", "file_ids":"${file_ids}"}
+      "ctx": {
+        "question": "${utterance}", 
+        "file_ids":"${file_ids}",
+
+      }
     }
     `;
   // } else {
@@ -802,7 +807,7 @@ function walker_get_file(file_id) {
     {
       "name": "get_file",
       "ctx": {
-          "id": "${file_id}"
+          "file_id": "${file_id}"
       }
     }
     `;
@@ -946,30 +951,5 @@ function walker_update_memory(id) {
 //     return result.json();
 //   });
 // }
-
-
-// function walker_get_base64(fild_id) {
-
-//   query = `
-//   {
-//     "name": "get_file",
-//     "ctx": {
-//         "file_id": "${fild_id}"
-//     }
-//   }
-//   `;
-
-//   return fetch(`${server}/js/walker_run`, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': `token ${token}`
-//     },
-//     body: query,
-//   }).then(function (result) {
-//     return result.json();
-//   });
-// }
-
 
 display_memory_feed();
