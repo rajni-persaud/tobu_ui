@@ -262,6 +262,9 @@ function render_memories(memories) {
 
     memory_date_created = isValidTimestamp(memory_date_created) ? memory_date_created.replace("T", " ").substring(0, memory_date_created.lastIndexOf(".")): memory_date_created;
     memory_date_modified = isValidTimestamp(memory_date_modified) ? memory_date_modified.replace("T", " ").substring(0, memory_date_modified.lastIndexOf(".")): memory_date_modified;
+
+    memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
+    memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
    
     m_keys = Object.keys(memories[i]);
 
