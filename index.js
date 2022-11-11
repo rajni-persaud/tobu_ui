@@ -162,7 +162,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
             </div>
             <div class="form-group">
               <label for="memory_who">Who:</label>  
-              <input type="text" class="form-control" name="memory_who">
+              <input type="text" class="form-control" id="memory_who" name="memory_who">
             </div>
             <div class="form-group">
               <label for="memory_description">Description</label>
@@ -446,12 +446,14 @@ function display_memory_modal(id) {
     for (let p = 0; p < memory.who.length; p++) {
       persons.push(memory.who[p]['context']['name']);
     }
+
     $('#memoryModal_btn_narrate').on('click',function(){
       readOutLoud(memory.summary);
     });
 
     $('#memoryModal_btn_edit').on('click',function(){
       $('#memoryModal_title').text("Edit Memory");
+
       $('input[name="memory_who"]').amsifySuggestags({
         suggestions: persons,
          });
@@ -462,6 +464,9 @@ function display_memory_modal(id) {
       document.getElementById("memory_when").value = memory.when;
       document.getElementById("memory_where").value = memory.where;
       document.getElementById("memory_how").value = memory.how;
+      document.getElementById("memory_who").value = persons.toString();
+      $('input[name="memory_who"]').amsifySuggestags();
+
       document.getElementById("memoryModal_edit").style.display = "block";
       document.getElementById("memoryModal_details").style.display = "none";
     });
