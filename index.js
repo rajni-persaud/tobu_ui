@@ -832,15 +832,6 @@ function walker_get_memories(question="") {
   }
   `;
 
-  query = `
-    {
-      "name": "get_memories",
-      "ctx": {
-          "question": "happy memories"
-      }
-  }
-  `;
-
   if (question){
     query = `
     {
