@@ -203,15 +203,44 @@ var query_inputField = document.getElementById('query__inputField');
 //fetches and renders memories in the feed area
 function display_memory_feed() {
   var memories = [];
-  
-  walker_get_memories(query_inputField.value).then((result) => {
-    
-    memories = result.report[0];  
-    render_memories(memories);
 
-  }).catch(function (error) {
-    console.log(error);
-  });
+  if(query_inputField.value){
+    walker_get_memories(query_inputField.value).then((result) => {
+    
+      memories = result.report[0];
+    memories = result.report[0];  
+      memories = result.report[0];
+      
+      if(memories.length > 0){
+        display_askTobu_alert(memories.length, query_inputField.value);
+        render_memories(memories);
+      }
+      else{
+        walker_get_memories().then((result) => {
+    
+          memories = result.report[0];
+          display_askTobu_alert(0, query_inputField.value);
+          render_memories(memories);
+      
+        }).catch(function (error) {
+          console.log(error);
+        });
+      }
+  
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+  else{
+    walker_get_memories().then((result) => {
+    
+      memories = result.report[0];  
+      render_memories(memories);
+  
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
 }
 
 //fetches and renders memories in the feed area based on a query
@@ -432,20 +461,33 @@ function render_related_memories(related_memories) {
 }
 
 function ask_tobu(){
-  // get input
-  var query_inputField = document.getElementById('query__inputField');
   //close this modal
   $('#ask_tobu_modal').modal('hide');
-  // display alert
-  $('#ask_tobu_alert').html(`
-  Showing results for: '${query_inputField.value}'
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="display_memory_feed()">
-    <span aria-hidden="true">&times;</span>
-  </button>
-  `);
-  document.getElementById("ask_tobu_alert").style.display = "block";
   display_memory_feed();
-  // clear query field after displaying feed 
+}
+
+function display_askTobu_alert(num_memories, query_value){
+  if(num_memories > 0){
+    // display alert
+    $('#ask_tobu_alert').html(`
+    Showing results for: '${query_value}'
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="display_memory_feed()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    `);
+    document.getElementById("ask_tobu_alert").style.display = "block";
+  }
+  else{
+    $('#ask_tobu_alert').html(`
+    No results found for: '${query_value}'; displaying all memories
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="display_memory_feed()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    `);
+    document.getElementById("ask_tobu_alert").style.display = "block";
+  }
+  // clear query field after displaying alert 
+  var query_inputField = document.getElementById('query__inputField');
   query_inputField.value = '';
 }
 
@@ -548,7 +590,9 @@ function display_memory_modal(id) {
         //close this modal
         $('#memoryModal').modal('hide');
         setTimeout(function() {
+          //resets feed and hide ask_tobu alert
           display_memory_feed();
+          document.getElementById("ask_tobu_alert").style.display = "none";
         }, 1500);
         
       }).catch(function(error) { console.log(error);});
@@ -575,6 +619,8 @@ function close_edit_modal(){
   document.getElementById("memoryModal_edit").style.display = "none";
   document.getElementById("memoryModal_details").style.display = "block";
   $('#memoryModal').modal('hide');
+  // hides ask_tobu alert
+  document.getElementById("ask_tobu_alert").style.display = "none";
   display_memory_feed();
 }
 
