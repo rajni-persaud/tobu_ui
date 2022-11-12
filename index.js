@@ -239,6 +239,8 @@ function isNumeric(n) {
 function render_memories(memories) {
 
   var imageData = null;
+  var display_memory_people = ``;
+
   //clear memory feed 
   $("#all_memories").html('');
   // console.log(memories);
@@ -278,68 +280,113 @@ function render_memories(memories) {
       rendered_related_memories = render_related_memories(related_memories);
     }
 
-    if (m_keys.includes("file_ids") && memories[i]["file_ids"]!= null) {
-      imageData = null;
-      
-      walker_get_file(memories[i]["file_ids"]).then((result) => {
-        imageData = result.report[0][0]['context']['base64'];
+    walker_get_memory(memories[i]["id"]).then((result) => {
+ 
+      var people = [];
+      for (let p = 0; p < result.report[0].who.length; p++) {
+        people.push(result.report[0].who[p]['context']['name']);
+      }
+
+      console.log(people);
+
+      // console.log(memories[i]["id"]);
+
+      if (m_keys.includes("file_ids") && memories[i]["file_ids"]!= null) {
+        imageData = null;
+        
+        walker_get_file(memories[i]["file_ids"]).then((result) => {
+          imageData = result.report[0][0]['context']['base64'];
+          
+          
+          if(imageData) {
+
+            if(people.length > 0){
+              display_memory_people = `<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${people.toString()}`;
+            }
+            else{
+              display_memory_people = ``;
+            }
+
+            $("#all_memories").append(
+              `
+              <div class="card mb-3">
+              <img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
+              <div class="card-body">
+                <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
+                <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
+                <p class="card-text"></p>
+                <p class="card-text">${memories[i]["summary"]}</p>
+                <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
+              </div>
+              ${rendered_related_memories}
+            </div> 
+        </div> 
+            </div> 
+              `
+            );
+          } else {
+
+            if(people.length > 0){
+              display_memory_people = `<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${people.toString()}`;
+            }
+            else{
+              display_memory_people = ``;
+            }
+
+            $("#all_memories").append(
+              `
+              <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["summary"]}</a></h5>
+                <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
+                <p class="card-text"></p>
+                <p class="card-text">${memories[i]["summary"]}</p>
+                <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
+              </div>
+              ${rendered_related_memories}
+            </div> 
+          </div> 
+            </div> 
+              `
+            );
+          }
         
         
-        if(imageData) {
+        }).catch(function (error) {
+            console.log(error);
+        });
+  
+      } else {
+
+        if(people.length > 0){
+          display_memory_people = `<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${people.toString()}`;
+        }
+        else{
+          display_memory_people = ``;
+        }
+  
         $("#all_memories").append(
           `
           <div class="card mb-3">
-          <img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
           <div class="card-body">
             <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
+            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
             <p class="card-text"></p>
             <p class="card-text">${memories[i]["summary"]}</p>
             <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
           </div>
           ${rendered_related_memories}
         </div> 
+      </div> 
+        </div> 
           `
         );
-        } else {
-          $("#all_memories").append(
-            `
-            <div class="card mb-3">
-            <div class="card-body">
-              <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["summary"]}</a></h5>
-              <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
-              <p class="card-text"></p>
-              <p class="card-text">${memories[i]["summary"]}</p>
-              <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
-            </div>
-            ${rendered_related_memories}
-          </div> 
-            `
-          );
-        }
-      
-      
-      }).catch(function (error) {
-          console.log(error);
-      });
+      }
+    
+    }).catch(function (error) {
+      console.log(error);
+    });
 
-    } else {
-
-      $("#all_memories").append(
-        `
-        <div class="card mb-3">
-        <div class="card-body">
-          <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-          <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}</small></p>
-          <p class="card-text"></p>
-          <p class="card-text">${memories[i]["summary"]}</p>
-          <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
-        </div>
-        ${rendered_related_memories}
-      </div> 
-        `
-      );
-    }
   }
 }
 
@@ -946,6 +993,21 @@ function walker_update_memory(id) {
   }).then(function (result) {
     return result.json();
   });
+}
+
+function get_memory_people(memory_id){
+  // This function returns a list of people in the memory
+  var people = [];
+  walker_get_memory(memory_id).then((result) => {
+ 
+    for (let p = 0; p < result.report[0].who.length; p++) {
+      people.push(result.report[0].who[p]['context']['name']);
+    }
+    
+  }).catch(function (error) {
+    console.log(error);
+  });
+
 }
 
 // function walker_query_memories(question) {
