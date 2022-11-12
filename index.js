@@ -184,6 +184,8 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 </div>
 
 
+<div id="ask_tobu_alert" class="alert alert-primary alert-dismissible fade show mb-3" role="alert" style="display:none;"></div>
+
 <div id="all_memories"></div>
 
 </div>
@@ -434,7 +436,15 @@ function ask_tobu(){
   var query_inputField = document.getElementById('query__inputField');
   //close this modal
   $('#ask_tobu_modal').modal('hide');
-      display_memory_feed();
+  // display alert
+  $('#ask_tobu_alert').html(`
+  Showing results for: '${query_inputField.value}'
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="display_memory_feed()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  `);
+  document.getElementById("ask_tobu_alert").style.display = "block";
+  display_memory_feed();
   // clear query field after displaying feed 
   query_inputField.value = '';
 }
