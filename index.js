@@ -10,7 +10,8 @@ emotions = {
   happy:["fa-smile-o", "orange"], 
   fear:["fa-frown-open", "green"], 
   anger:["fa-angry", "red"], 
-  surprised:["fa-surprise", "yellow"]
+  surprised:["fa-surprise", "yellow"],
+  default: ["fa-meh-blank", "grey"]
 };
 
 //say = "Arianna is growing up so fast. Today she's been trying to stand on her own. It fills me up with such a sense of joy to see my little girl blossom before me.";
@@ -287,6 +288,7 @@ function render_memories(memories) {
     memory_when = memories[i]["when"];
     memory_date_created = memories[i]["date_created"];
     memory_date_modified = memories[i]["date_modified"];
+    memory_emotion = [];
 
     memory_subject = memory_subject === null ? "Subject N/A" : memory_subject;
     memory_description = memory_description === null ? "Description N/A" : memory_description;
@@ -303,13 +305,6 @@ function render_memories(memories) {
     memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
    
     m_keys = Object.keys(memories[i]);
-
-    rendered_related_memories = ``;
-
-    if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
-      related_memories = memories[i]["relatedMemories"];
-      rendered_related_memories = render_related_memories(related_memories);
-    }
 
     walker_get_memory(memories[i]["id"]).then((result) => {
  
@@ -338,13 +333,22 @@ function render_memories(memories) {
               display_memory_people = ``;
             }
 
+            memory_emotion = memories[i]["how"] == "" ? emotions["default"] : emotions[memories[i]["how"]];
+
+            rendered_related_memories = ``;
+
+            if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
+              related_memories = memories[i]["relatedMemories"];
+              rendered_related_memories = render_related_memories(related_memories);
+            }
+
             $("#all_memories").append(
               `
               <div class="card mb-3">
               <img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
               <div class="card-body">
                 <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-                <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
+                <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
                 <p class="card-text"></p>
                 <p class="card-text">${memories[i]["summary"]}</p>
                 <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
@@ -364,12 +368,21 @@ function render_memories(memories) {
               display_memory_people = ``;
             }
 
+            memory_emotion = memories[i]["how"] == "" ? emotions["default"] : emotions[memories[i]["how"]];
+
+            rendered_related_memories = ``;
+
+            if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
+              related_memories = memories[i]["relatedMemories"];
+              rendered_related_memories = render_related_memories(related_memories);
+            }
+
             $("#all_memories").append(
               `
               <div class="card mb-3">
               <div class="card-body">
                 <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["summary"]}</a></h5>
-                <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
+                <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
                 <p class="card-text"></p>
                 <p class="card-text">${memories[i]["summary"]}</p>
                 <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
@@ -395,13 +408,22 @@ function render_memories(memories) {
         else{
           display_memory_people = ``;
         }
+
+        memory_emotion = memories[i]["how"] == "" ? emotions["default"] : emotions[memories[i]["how"]];
+
+        rendered_related_memories = ``;
+
+        if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
+          related_memories = memories[i]["relatedMemories"];
+          rendered_related_memories = render_related_memories(related_memories);
+        }
   
         $("#all_memories").append(
           `
           <div class="card mb-3">
           <div class="card-body">
             <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-            <p class="card-text"><small class="text-muted"><span><i class="fa ${emotions[memories[i]["how"]][0]}" style="color: ${emotions[memories[i]["how"]][1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
+            <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
             <p class="card-text"></p>
             <p class="card-text">${memories[i]["summary"]}</p>
             <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
@@ -552,7 +574,13 @@ function display_memory_modal(id) {
     $('#memoryModal_date').text(memory.when);
     $('#memoryModal_where').text(memory.where);
     $('#memoryModal_description').text(memory.description);
-    $('#memoryModal_how').html(`<i class="fa ${emotions[memory.how][0]}" style="color: ${emotions[memory.how][1]};"></i>`);
+    if(memory.how == ""){
+      $('#memoryModal_how').html(`<i class="fa ${emotions["default"][0]}" style="color: ${emotions["default"][1]};"></i>`);
+    }
+    else{
+      $('#memoryModal_how').html(`<i class="fa ${emotions[memory.how][0]}" style="color: ${emotions[memory.how][1]};"></i>`);
+    }
+
     $('#memoryModal_lastUpdated').text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
     $('#memoryModal_related_memories').html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
 
