@@ -209,8 +209,6 @@ function display_memory_feed() {
     walker_get_memories(query_inputField.value).then((result) => {
     
       memories = result.report[0];
-    memories = result.report[0];  
-      memories = result.report[0];
       
       if(memories.length > 0){
         display_askTobu_alert(memories.length, query_inputField.value);
@@ -345,18 +343,16 @@ function render_memories(memories) {
             $("#all_memories").append(
               `
               <div class="card mb-3">
-              <img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
-              <div class="card-body">
-                <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-                <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
-                <p class="card-text"></p>
-                <p class="card-text">${memories[i]["summary"]}</p>
-                <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
-              </div>
-              ${rendered_related_memories}
-            </div> 
-        </div> 
-            </div> 
+                <img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
+                <div class="card-body">
+                  <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
+                  <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
+                  <p class="card-text"></p>
+                  <p class="card-text">${memories[i]["summary"]}</p>
+                  <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
+                </div>
+                ${rendered_related_memories} 
+              </div> 
               `
             );
           } else {
@@ -380,17 +376,15 @@ function render_memories(memories) {
             $("#all_memories").append(
               `
               <div class="card mb-3">
-              <div class="card-body">
-                <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["summary"]}</a></h5>
-                <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
-                <p class="card-text"></p>
-                <p class="card-text">${memories[i]["summary"]}</p>
-                <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
-              </div>
-              ${rendered_related_memories}
-            </div> 
-          </div> 
-            </div> 
+                <div class="card-body">
+                  <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["summary"]}</a></h5>
+                  <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
+                  <p class="card-text"></p>
+                  <p class="card-text">${memories[i]["summary"]}</p>
+                  <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
+                </div>
+                ${rendered_related_memories}
+              </div> 
               `
             );
           }
@@ -421,17 +415,15 @@ function render_memories(memories) {
         $("#all_memories").append(
           `
           <div class="card mb-3">
-          <div class="card-body">
-            <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-            <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
-            <p class="card-text"></p>
-            <p class="card-text">${memories[i]["summary"]}</p>
-            <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
-          </div>
-          ${rendered_related_memories}
-        </div> 
-      </div> 
-        </div> 
+            <div class="card-body">
+              <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
+              <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
+              <p class="card-text"></p>
+              <p class="card-text">${memories[i]["summary"]}</p>
+              <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
+            </div>
+            ${rendered_related_memories}
+          </div> 
           `
         );
       }
