@@ -30,55 +30,110 @@
     </script>
     <script src="js/artyom/artyom.window.min.js"></script>
     <script>
-      var query_textbox = $("#query__inputField");
-      var chat_textbox = $("#chatio__inputField")
+      // var query_textbox = $("#query__inputField");
+      // var chat_textbox = $("#chatio__inputField")
 
-      const chat_artyom = new Artyom();
-      // This function activates artyom and will listen all that you say forever (requires https conection, otherwise a dialog will request if you allow the use of the microphone)
-      function chat_startContinuousArtyom(){
-          chat_artyom.fatality();// use this to stop any of
+      // const chat_artyom = new Artyom();
+      // // This function activates artyom and will listen all that you say forever (requires https conection, otherwise a dialog will request if you allow the use of the microphone)
+      // function chat_startContinuousArtyom(){
+      //     chat_artyom.fatality();// use this to stop any of
 
-          setTimeout(function(){// if you use artyom.fatality , wait 250 ms to initialize again.
-              chat_artyom.initialize({
-                  lang:"en-GB",// A lot of languages are supported. Read the docs !
-                  continuous:true,// Artyom will listen forever
-                  listen:true, // Start recognizing
-                  debug:true, // Show everything in the console
-                  speed:1 // talk normally
-              }).then(function(){
-                  console.log("Ready to work !");
-              });
-          },250);
-      }
-      chat_startContinuousArtyom();
-      var Chat_UserDictation = chat_artyom.newDictation({
-          continuous:true, // Enable continuous if HTTPS connection
-          onResult:function(chat_text){
-              // Do something with the text
-              console.log(chat_text);
-              chat_textbox.val(chat_text);
-          },
-          onStart:function(){
-              console.log("chat started");
-          },
-          onEnd:function(){
-              alert("Dictation stopped by the user");
-          }
-      });
+      //     setTimeout(function(){// if you use artyom.fatality , wait 250 ms to initialize again.
+      //         chat_artyom.initialize({
+      //             lang:"en-GB",// A lot of languages are supported. Read the docs !
+      //             continuous:true,// Artyom will listen forever
+      //             listen:true, // Start recognizing
+      //             debug:true, // Show everything in the console
+      //             speed:1 // talk normally
+      //         }).then(function(){
+      //             console.log("Ready to work !");
+      //         });
+      //     },250);
+      // }
+      // chat_startContinuousArtyom();
+      // var Chat_UserDictation = chat_artyom.newDictation({
+      //     continuous:true, // Enable continuous if HTTPS connection
+      //     onResult:function(chat_text){
+      //         // Do something with the text
+      //         console.log(chat_text);
+      //         chat_textbox.val(chat_text);
+      //     },
+      //     onStart:function(){
+      //         console.log("chat started");
+      //     },
+      //     onEnd:function(){
+      //         alert("Dictation stopped by the user");
+      //     }
+      // });
 
-      Chat_UserDictation.start();
+      // Chat_UserDictation.start();
 
-      // Stop whenever you want
-      // Chat_UserDictation.stop();
+      // // Stop whenever you want
+      // // Chat_UserDictation.stop();
 
-      chat_artyom.redirectRecognizedTextOutput(function(chat_recognized,chat_isFinal){
-          if(chat_isFinal){
-            chat_textbox.val(chat_text);
-          }else{
-            chat_textbox.val(chat_text);
-          }
-      });
+      // chat_artyom.redirectRecognizedTextOutput(function(chat_recognized,chat_isFinal){
+      //     if(chat_isFinal){
+      //       chat_textbox.val(chat_text);
+      //     }else{
+      //       chat_textbox.val(chat_text);
+      //     }
+      // });
 
+      // const query_artyom = new Artyom();
+      // // This function activates artyom and will listen all that you say forever (requires https conection, otherwise a dialog will request if you allow the use of the microphone)
+      // function query_startContinuousArtyom(){
+      //     query_artyom.fatality();// use this to stop any of
+
+      //     setTimeout(function(){// if you use artyom.fatality , wait 250 ms to initialize again.
+      //         query_artyom.initialize({
+      //             lang:"en-GB",// A lot of languages are supported. Read the docs !
+      //             continuous:true,// Artyom will listen forever
+      //             listen:true, // Start recognizing
+      //             debug:true, // Show everything in the console
+      //             speed:1 // talk normally
+      //         }).then(function(){
+      //             console.log("Ready to work !");
+      //         });
+      //     },250);
+      // }
+      // query_startContinuousArtyom();
+      // var Query_UserDictation = query_artyom.newDictation({
+      //     continuous:true, // Enable continuous if HTTPS connection
+      //     onResult:function(query_text){
+      //         // Do something with the text
+      //         console.log(query_text);
+      //         query_textbox.val(query_text);
+      //     },
+      //     onStart:function(){
+      //       console.log("query started");
+      //     },
+      //     onEnd:function(){
+      //         alert("Dictation stopped by the user");
+      //     }
+      // });
+
+      // Query_UserDictation.start();
+
+      // // Stop whenever you want
+      // // Query_UserDictation.stop();
+
+      // query_artyom.redirectRecognizedTextOutput(function(query_recognized,query_isFinal){
+      //     if(query_isFinal){
+      //         query_textbox.val(query_recognized);
+      //     }else{
+      //       query_textbox.val(query_recognized);
+      //     }
+      // });
+
+      // chat_artyom.redirectRecognizedTextOutput(function(chat_recognized,chat_isFinal){
+      //     if(chat_isFinal){
+      //       chat_textbox.val(chat_text);
+      //     }else{
+      //       chat_textbox.val(chat_text);
+      //     }
+      // });
+
+      // var query_textbox = $("#artyom_test");
       const query_artyom = new Artyom();
       // This function activates artyom and will listen all that you say forever (requires https conection, otherwise a dialog will request if you allow the use of the microphone)
       function query_startContinuousArtyom(){
@@ -102,10 +157,10 @@
           onResult:function(query_text){
               // Do something with the text
               console.log(query_text);
-              query_textbox.val(query_text);
+              document.getElementById("artyom_test").innerHTML = query_text;
           },
           onStart:function(){
-            console.log("query started");
+            document.getElementById("artyom_test").innerHTML = "start";
           },
           onEnd:function(){
               alert("Dictation stopped by the user");
@@ -117,13 +172,46 @@
       // Stop whenever you want
       // Query_UserDictation.stop();
 
-      query_artyom.redirectRecognizedTextOutput(function(query_recognized,query_isFinal){
-          if(query_isFinal){
-              query_textbox.val(query_recognized);
-          }else{
-            query_textbox.val(query_recognized);
-          }
+      // query_artyom.redirectRecognizedTextOutput(function(query_recognized,query_isFinal){
+      //     if(query_isFinal){
+      //       document.getElementById("artyom_test").innerHTML = "Final recognized text: " + query_recognized;
+      //     }else{
+      //       document.getElementById("artyom_test").innerHTML = query_recognized;
+      //     }
+      // });
+
+      var command_listening_sound = new Audio('silence.mp3');
+      query_artyom.redirectRecognizedTextOutput(function(text,isFinal){
+      var span = document.getElementById('artyom_test');
+
+       if(isFinal){
+          span.innerHTML = text;
+		  window.command_listening_sound.pause();
+		
+		   
+	      
+        } else {
+				span.innerHTML = text;
+		  
+				window.command_listening_sound.currentTime=0;
+				window.command_listening_sound.play();
+		  
+				window.command_listening_sound.addEventListener('timeupdate', timeupdateREAL);
+			};
       });
+	  
+     function timeupdateREAL(){
+		 
+		if (window.command_listening_sound.currentTime > 3) {
+			abortartyom();
+		}};
+			
+
+	  function abortartyom(){
+				console.log("Timeoutreached");
+				window.command_listening_sound.removeEventListener('timeupdate', timeupdateREAL);
+				artyom.ArtyomWebkitSpeechRecognition.abort();
+			};
     </script>
     <title>Tobu</title>
   </head>
@@ -141,6 +229,8 @@
       ></script>
 
     </div>
+
+    <div id="artyom_test">Startttt</div>
 
     
     <!--CONTENT -->
