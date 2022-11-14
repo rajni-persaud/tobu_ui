@@ -23,6 +23,21 @@ emotion_select_options = ``;
     emotion_select_options = emotion_select_options + `<option value="${emotions_select_values[i]}">${emotions_select_values[i]}</option>`;
   }
 
+// Initialize new SpeechSynthesisUtterance object
+let speech = new SpeechSynthesisUtterance();
+speech.lang = "en";
+let voices = [];
+
+window.speechSynthesis.onvoiceschanged = () => {
+  // Get List of Voices
+  voices = window.speechSynthesis.getVoices();
+  //set the voice.
+  if(voices.length > 49) speech.voice = voices[49]; //US Female
+  speech.volume = 1;
+  speech.rate = 0.85;
+  speech.pitch = 1;
+};
+
 // // Replace the script tag with the app
 document.getElementById('app-interact').parentNode.innerHTML = `
 <!-- NAVBAR--><nav class="navbar navbar-expand-sm navbar-dark">
@@ -653,11 +668,16 @@ function save_memory_details(){
 }
 
 function readOutLoud(message){
-  speech = new SpeechSynthesisUtterance(message);
-  speech.volume = 1;
-  speech.rate = 1;
-  speech.pitch = 1;
+  speech.text = message;
   window.speechSynthesis.speak(speech);
+
+  // const artyom = new Artyom();
+  // if(artyom.speechSupported()){
+  //   artyom.say(message);
+  // }else{
+  //   // Unsupported :/
+  // }
+
 }
 
 var speechRecognition = window.webkitSpeechRecognition
