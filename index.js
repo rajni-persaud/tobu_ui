@@ -38,6 +38,106 @@ window.speechSynthesis.onvoiceschanged = () => {
   speech.pitch = 1;
 };
 
+// var query_textbox = $("#query__inputField");
+// var chat_textbox = $("#chatio__inputField");
+
+const artyom = new Artyom();
+
+// // Add a single command
+var commandHello = {
+  indexes:["I'd like to add a memory"], // These spoken words will trigger the execution of the command
+  action:function(){ // Action to be executed when a index match with spoken word
+      //artyom.say("I'm Tobu, I can help you remember.");
+      //console.log("hi");
+      display_capture_modal();
+      artyom.fatality();
+  }
+};
+
+artyom.addCommands(commandHello); 
+
+// // This function activates artyom and will listen all that you say forever (requires https conection, otherwise a dialog will request if you allow the use of the microphone)
+function startContinuousArtyom() {
+  artyom.fatality();// use this to stop 
+
+  setTimeout(function(){// if you use artyom.fatality , wait 250 ms to initialize again.
+       artyom.initialize({
+          lang:"en-US",// A lot of languages are supported. Read the docs !
+          continuous:true,// Artyom will listen forever
+          listen:true, // Start recognizing
+          debug:true, // Show everything in the console
+          speed:1, // talk normally
+          name: "hey there"
+      }).then(function(){
+          console.log("Ready to work !");
+      });
+  },250);
+}
+
+// var Chat_UserDictation = chat_artyom.newDictation({
+//     continuous:true, // Enable continuous if HTTPS connection
+//     onResult:function(chat_text){
+//         // Do something with the text
+//         console.log(chat_text);
+//         chat_textbox.val(chat_text);
+//     },
+//     onStart:function(){
+//         console.log("chat started");
+//     },
+//     onEnd:function(){
+//         alert("Dictation stopped by the user");
+//     }
+// });
+
+// Stop whenever you want
+// Chat_UserDictation.stop();
+
+/*const query_artyom = new Artyom();
+// This function activates artyom and will listen all that you say forever (requires https conection, otherwise a dialog will request if you allow the use of the microphone)
+function query_startContinuousArtyom(){
+    query_artyom.fatality();// use this to stop any of
+
+    setTimeout(function(){// if you use artyom.fatality , wait 250 ms to initialize again.
+        query_artyom.initialize({
+            lang:"en-GB",// A lot of languages are supported. Read the docs !
+            continuous:true,// Artyom will listen forever
+            listen:true, // Start recognizing
+            debug:true, // Show everything in the console
+            speed:1 // talk normally
+        }).then(function(){
+            console.log("Ready to work !");
+        });
+    },250);
+}
+query_startContinuousArtyom();
+var Query_UserDictation = query_artyom.newDictation({
+    continuous:true, // Enable continuous if HTTPS connection
+    onResult:function(query_text){
+        // Do something with the text
+        console.log(query_text);
+        query_textbox.val(query_text);
+    },
+    onStart:function(){
+      console.log("query started");
+    },
+    onEnd:function(){
+        alert("Dictation stopped by the user");
+    }
+});
+
+Query_UserDictation.start();
+
+// Stop whenever you want
+// Query_UserDictation.stop();
+
+query_artyom.redirectRecognizedTextOutput(function(query_recognized,query_isFinal){
+    if(query_isFinal){
+        query_textbox.val(query_recognized);
+    }else{
+      query_textbox.val(query_recognized);
+    }
+});*/
+
 // // Replace the script tag with the app
 document.getElementById('app-interact').parentNode.innerHTML = `
 <!-- NAVBAR--><nav class="navbar navbar-expand-sm navbar-dark">
@@ -260,6 +360,8 @@ function display_memory_feed() {
       console.log(error);
     });
   }
+
+  startContinuousArtyom();
 }
 
 //fetches and renders memories in the feed area based on a query
@@ -693,16 +795,16 @@ function save_memory_details(){
   }, 1500);
 }
 
-function readOutLoud(message){
-  speech.text = message;
-  window.speechSynthesis.speak(speech);
+function readOutLoud(message) {
+  // speech.text = message;
+  // window.speechSynthesis.speak(speech);
 
   // const artyom = new Artyom();
-  // if(artyom.speechSupported()){
-  //   artyom.say(message);
-  // }else{
-  //   // Unsupported :/
-  // }
+  if(artyom.speechSupported()){
+    artyom.say(message);
+  }else{
+    // Unsupported :/
+  }
 
 }
 
