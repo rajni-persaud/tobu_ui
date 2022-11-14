@@ -19,7 +19,7 @@ emotions = {
 // list of emotions to be used in select list
 emotions_select_values = Object.keys(emotions);
 emotion_select_options = ``;
-  for (i=0; i<emotions_select_values.length; i++){
+  for (i=0; i<(emotions_select_values.length - 1); i++){
     emotion_select_options = emotion_select_options + `<option value="${emotions_select_values[i]}">${emotions_select_values[i]}</option>`;
   }
 
@@ -96,7 +96,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
         <div class="modal-body">
         <!-- <button type="button" class="btn btn-outline-secondary">Add Photo/Video</button> -->
           
-        <input type="file" name="" id="fileId" onchange="imageUploaded()">
+        <div id="create_image_input"><input type="file" name="" id="fileId" onchange="imageUploaded()"></div>
         <br><br>
   
           <div id="photos">
@@ -155,6 +155,7 @@ document.getElementById('app-interact').parentNode.innerHTML = `
           </div>
         </div>
         <div id="memoryModal_edit" style="display: none">
+          <div id="edit_image_input"><input type="file" name="" id="fileId" onchange="editImageUploaded()"></div>
           <div id="edit_photos"></div>
           <form>
             <div class="form-group">
@@ -210,6 +211,10 @@ document.getElementById('app-interact').parentNode.innerHTML = `
 var chat_messages = [];
 var create_memory_images = [];
 var upload_ids = [];
+upload_ids = new Array();
+var edit_memory_images = [];
+var edit_memory_ids = [];
+edit_memory_ids = new Array();
 var extension = "";
 var file_upload = false;
 
@@ -333,7 +338,7 @@ function render_memories(memories) {
       if (m_keys.includes("file_ids") && memories[i]["file_ids"]!= null) {
         imageData = null;
         
-        walker_get_file(memories[i]["file_ids"]).then((result) => {
+        walker_get_file(memories[i]["file_ids"].split(",")[0]).then((result) => {
           imageData = result.report[0][0]['context']['base64'];
           
           
@@ -550,6 +555,7 @@ function display_memory_modal(id) {
   memory = [];
   memory_display_photos = [];
   file_upload = false;
+  edit_memory_ids = [];
   walker_get_memory(id).then((result) => {
 
     memory = result.report[0];  
@@ -557,25 +563,49 @@ function display_memory_modal(id) {
     console.log(memory.file_ids);
 
     if(memory.file_ids && memory.file_ids.length > 0) {
-      if(memory.file_ids[0]) {
+      // edit_memory_ids = memory.file_ids;
+      // console.log(memory.file_ids);
+      if(memory.file_ids[0].split(",")[0]) {
         walker_get_file(memory.file_ids).then((result) => {
             $('#memoryModal_image').html(`<img src="data:image/png;base64,${result["report"][0][0]['context']['base64']}" class="card-img-top" alt="...">`)
         })
       }
-      
-      for (let p = 0; p < memory.file_ids.length; p++) {
-        console.log(memory.file_ids[p]);
-        walker_get_file(memory.file_ids[p]).then((result) => {
+
+      if(memory.file_ids[0].includes(",")){
+
+        var memory_images_arr = memory.file_ids[0].split(",");
+      for (let p = 0; p < memory_images_arr.length; p++) {
+        console.log(memory_images_arr[p]);
+        walker_get_file(memory_images_arr[p]).then((result) => {
           memory_display_photos.push(result["report"][0][0]['context']['base64']);
-          display_memory_photos(memory.file_ids[p], memory_display_photos);
+          display_memory_photos(memory.id, memory_images_arr[p], memory_display_photos);
         })
       }
+
+      }
+      else{
+        console.log(memory.file_ids);
+        walker_get_file(memory.file_ids).then((result) => {
+          memory_display_photos.push(result["report"][0][0]['context']['base64']);
+          display_memory_photos(memory.id, memory.file_ids, memory_display_photos);
+        })
+      }
+
+      
+      // for (let p = 0; p < memory.file_ids.length; p++) {
+      //   console.log(memory.file_ids[p]);
+      //   walker_get_file(memory.file_ids[p]).then((result) => {
+      //     memory_display_photos.push(result["report"][0][0]['context']['base64']);
+      //     display_memory_photos(memory.file_ids[p], memory_display_photos);
+      //   })
+      // }
+  
 
     } else {
       $('#memoryModal_image').html(' ');
     }
 
-    console.log(memory.id);
+    console.log(memory);
     $('#memoryModal_title').text(memory.when);
     $('#memoryModal_subject').text(memory.subject);
     $('#memoryModal_date').text(memory.when);
@@ -641,13 +671,19 @@ function display_memory_modal(id) {
 
 }
 
-function display_memory_photos(memory_file_ids, memory_photos){
+function display_memory_photos(memory_id, memory_file_ids, memory_photos){
   d_memory_photos = ``;
   for (let ph = 0; ph < memory_photos.length; ph++) {
-    d_memory_photos = d_memory_photos + `<div><i class="fas fa-times" style="padding-right: 20px; margin-bottom: 10px;"></i><img src="data:image/png;base64,${memory_photos[ph]}" style="height: 200px;"></div>`;
+    d_memory_photos = d_memory_photos + `<div><i class="fas fa-times" style="padding-right: 20px; margin-bottom: 10px;" onclick="delete_memory_photo('${memory_id}', '${memory_file_ids}', '${memory_file_ids}')"></i><img src="data:image/png;base64,${memory_photos[ph]}" style="height: 200px;"></div>`;
     // display photos above edit form
     $('#edit_photos').html(`<div class="tb"><div class="tr">${d_memory_photos}</div></div>`);
   }
+}
+
+function delete_memory_photo(memory_id, photo_id, memory_file_ids){
+  // alert(`${memory_id}, ${photo_id}`);
+  delete_photo_from_memory(memory_id, photo_id, memory_file_ids).then((result) => {}).catch(function(error) { console.log(error);});
+  walker_delete_file(photo_id).then((result) => {}).catch(function(error) { console.log(error);});
 }
 
 function close_edit_modal(){
@@ -660,7 +696,7 @@ function close_edit_modal(){
 }
 
 function save_memory_details(){
-  walker_update_memory(memory.id);
+  walker_update_memory(memory.id, edit_memory_ids, extension);
   console.log(who_selected);
   setTimeout(function() {
     close_edit_modal();
@@ -826,7 +862,7 @@ function imageUploaded() {
   var base64String = "";
 
   var file = document.querySelector(
-      'input[type=file]')['files'][0];
+      '#create_image_input input[type=file]')['files'][0];
 
   file_upload = true;
 
@@ -847,7 +883,7 @@ function imageUploaded() {
         console.log(result.report[0][0]['context']['id']);
 
         if(create_memory_images.length > 0){
-          upload_ids = new Array(result.report[0][0]['context']['id']);
+          upload_ids.push(result.report[0][0]['context']['id']);
           document.getElementById("photos").style.display = "block";
         }
 
@@ -864,6 +900,47 @@ function imageUploaded() {
 
   reader.readAsDataURL(file);
 }
+
+function editImageUploaded() {
+
+  file_upload = true;
+
+  var base64String = "";
+
+  var file = document.querySelector(
+      '#edit_image_input input[type=file]')['files'][0];
+
+  extension = file.name;
+
+  var reader = new FileReader();
+    
+  reader.onload = function () {
+      base64String = reader.result.replace("data:", "")
+          .replace(/^.+,/, "");
+      imageBase64Stringsep = base64String;
+      edit_memory_images.push(base64String);
+      console.log(edit_memory_images);
+      // console.log(base64String);
+
+      walker_run_upload(extension, base64String).then((result) => {
+
+        console.log(result.report[0][0]['context']['id']);
+        
+        if(edit_memory_images.length > 0){
+          // edit_memory_ids = new Array(result.report[0][0]['context']['id']);
+          edit_memory_ids.push(result.report[0][0]['context']['id']);
+          console.log(edit_memory_ids);
+        }
+
+
+      }).catch(function (error) {
+          console.log(error);
+      });
+  }
+
+  reader.readAsDataURL(file);
+}
+
 
 
 
@@ -1062,7 +1139,28 @@ function walker_delete_memory(id) {
   });
 }
 
-function walker_update_memory(id) {
+function walker_delete_file(id) {
+
+  query = `
+  {
+    "name": "delete_file",
+    "ctx": {"id":"${id}"}
+  }
+  `;
+
+  return fetch(`${server}/js/walker_run`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `token ${token}`
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
+}
+
+function walker_update_memory(id, file_ids=[], file_name="") {
 
   query = `
   {
@@ -1074,7 +1172,60 @@ function walker_update_memory(id) {
       "description": "${document.getElementById('memory_description').value}",
       "when": "${document.getElementById('memory_when').value}",
       "where": "${document.getElementById('memory_where').value}",
-      "how": "${document.getElementById('memory_how').value}"
+      "how": "${document.getElementById('memory_how').value}",
+      "file_ids": "${file_ids}"
+    }
+  }
+  `;
+
+  if(file_upload){
+
+    query = `
+  {
+    "name": "update_memory",
+    "ctx": {
+      "id":"${id}",
+      "subject": "${document.getElementById('memory_subject').value}",
+      "summary": "${document.getElementById('memory_summary').value}",
+      "description": "${document.getElementById('memory_description').value}",
+      "when": "${document.getElementById('memory_when').value}",
+      "where": "${document.getElementById('memory_where').value}",
+      "how": "${document.getElementById('memory_how').value}",
+      "file_ids": "${file_ids}",
+      "file_name": "${file_name}"
+    }
+  }
+  `;
+}
+
+  return fetch(`${server}/js/walker_run`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `token ${token}`
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
+}
+
+function delete_photo_from_memory(id, file_id, file_ids) {
+
+  if(Array.isArray(file_ids)){
+    removeItem(file_id, file_ids);
+  }
+
+  if (typeof file_ids === 'string' && file_ids === file_id){
+    file_ids = null;
+  }
+
+  query = `
+  {
+    "name": "update_memory",
+    "ctx": {
+      "id":"${id}",
+      "file_ids": ${file_ids}
     }
   }
   `;
@@ -1090,6 +1241,7 @@ function walker_update_memory(id) {
     return result.json();
   });
 }
+
 
 function get_memory_people(memory_id){
   // This function returns a list of people in the memory
