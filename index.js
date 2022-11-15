@@ -459,7 +459,71 @@ function render_memories(memories) {
 
             if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
               related_memories = memories[i]["relatedMemories"];
-              rendered_related_memories = render_related_memories(related_memories);
+              related_memories_images = [];
+
+              if(related_memories.length > 0) {
+                    
+                for (let r = 0; r < related_memories.length; r++) {
+                  relatedImageData = null;
+
+                  console.log(related_memories[i]);
+                  rm_keys = Object.keys(related_memories[i]);
+                  if(rm_keys.includes("file_ids") && related_memories[i]["file_ids"]!= null){
+                  walker_get_file(related_memories[i]["file_ids"]).then((result) => {
+                    related_memories_images.push(result.report[0][0]['context']['base64']);
+                    console.log(related_memories_images);
+                  }).catch(function(error) { console.log(error);});
+                }
+                  else{
+                    related_memories_images.push(null);
+                  }
+                }
+              }
+
+
+              rendered_related_memories = render_related_memories(related_memories, related_memories_images);
+
+              // var rm_output = ``;
+              // var rm_content = ``;
+              
+              // console.log(related_memories);
+              
+              // if(related_memories && related_memories.length > 0) {
+                    
+              //   for (let r = 0; r < related_memories.length; r++) {
+              //     relatedImageData = null;
+
+              //     console.log(related_memories[i]);
+              //     if(related_memories[i]["file_ids"] != null){
+              //     walker_get_file(related_memories[i]["file_ids"]).then((result) => {
+              //       relatedImageData = result.report[0][0]['context']['base64'];
+              //       if (relatedImageData){
+              //         rm_content = `<div class="td" style="background-image: url('data:image/jpeg;base64,${relatedImageData}')"></div>`;
+              //       }
+              //     }).catch(function(error) { console.log(error);});
+              //   }
+              //     else{
+              //       rm_content = `${related_memories[r]["subject"]}`;
+              //     }
+            
+              //     if(related_memories[r]["id"]) rm_output = rm_output + `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_content}</div>`;
+              //   }
+            
+              //   rendered_related_memories = `
+              //   <div class="card-footer" style="margin-bottom: 1%;">
+              //   <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
+              //   <div class="related_memories">
+              //     <div class="tb">
+              //       <div class="tr">
+              //         ${rm_output}
+              //       </div>
+                    
+              //     </div>
+              //   </div>
+              // </div>
+              //   `;
+              // }
+
             }
 
             $("#all_memories").append(
@@ -577,10 +641,30 @@ function render_memories(memories) {
 
         rendered_related_memories = ``;
 
-        if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
-          related_memories = memories[i]["relatedMemories"];
-          rendered_related_memories = render_related_memories(related_memories);
-        }
+            if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
+              related_memories = memories[i]["relatedMemories"];
+              related_memories_images = [];
+
+              if(related_memories.length > 0) {
+                    
+                for (let r = 0; r < related_memories.length; r++) {
+                  relatedImageData = null;
+
+                  console.log(related_memories[i]);
+                  rm_keys = Object.keys(related_memories[i]);
+                  if(rm_keys.includes("file_ids") && related_memories[i]["file_ids"]!= null){
+                  walker_get_file(related_memories[i]["file_ids"]).then((result) => {
+                    related_memories_images.push(result.report[0][0]['context']['base64']);
+                    console.log(related_memories_images);
+                  }).catch(function(error) { console.log(error);});
+                }
+                  else{
+                    related_memories_images.push(null);
+                  }
+                }
+              }
+              rendered_related_memories = render_related_memories(related_memories, related_memories_images);
+            }
   
         $("#all_memories").append(
           `
@@ -606,22 +690,24 @@ function render_memories(memories) {
 }
 
 
-function render_related_memories(related_memories) {
+function render_related_memories(related_memories, related_memories_images) {
   var output = ``;
   var rm_output = ``;
   var rm_content = ``;
+
+  console.log(related_memories_images);
   
   if(related_memories && related_memories.length > 0) {
         
     for (let r = 0; r < related_memories.length; r++) {
-      // if (image){
-      //   rm_content = `<div class="td" style="background-image: url('[image_url]')"></div>`;
-      // }
-      // else{
-      //   rm_content = `${related_memories[r]["subject"]}`;
-      // }
+      if (related_memories_images[i]){
+        rm_content = `<div class="td" style="background-image: url('${related_memories_images[i]}')"></div>`;
+      }
+      else{
+        rm_content = `${related_memories[r]["subject"]}`;
+      }
 
-      rm_content = related_memories[r]["subject"];
+      // rm_content = related_memories[r]["subject"];
 
       if(related_memories[r]["id"]) rm_output = rm_output + `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_content}</div>`;
     }
@@ -770,7 +856,33 @@ function display_memory_modal(id) {
     }
 
     $('#memoryModal_lastUpdated').text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
-    $('#memoryModal_related_memories').html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
+
+    rendered_related_memories = ``;
+
+    related_memories = memory.relatedMemories;
+    related_memories_images = [];
+
+    if(related_memories.length > 0) {
+          
+      for (let r = 0; r < related_memories.length; r++) {
+        relatedImageData = null;
+
+        console.log(related_memories[i]);
+        rm_keys = Object.keys(related_memories[i]);
+        if(rm_keys.includes("file_ids") && related_memories[i]["file_ids"]!= null){
+        walker_get_file(related_memories[i]["file_ids"]).then((result) => {
+          related_memories_images.push(result.report[0][0]['context']['base64']);
+          console.log(related_memories_images);
+        }).catch(function(error) { console.log(error);});
+      }
+        else{
+          related_memories_images.push(null);
+        }
+      }
+    }
+    rendered_related_memories = render_related_memories(related_memories, related_memories_images);
+
+    $('#memoryModal_related_memories').html(rendered_related_memories); //Tim needs to spell this correctly
 
     persons = [];
     for (let p = 0; p < memory.who.length; p++) {
