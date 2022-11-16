@@ -142,7 +142,7 @@ query_artyom.redirectRecognizedTextOutput(function(query_recognized,query_isFina
 document.getElementById('app-interact').parentNode.innerHTML = `
 <!-- NAVBAR--><nav class="navbar navbar-expand-sm navbar-dark">
 <div class="container">
-<a href="./home.html" class="navbar-brand">
+<a onclick="location.reload()" class="navbar-brand">
     <!-- Logo Image -->
     <img src="./images/tobu_logo_w.png" width="30" height="30" alt="" class="d-inline-block align-middle mr-2">
 </a>
