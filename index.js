@@ -390,324 +390,132 @@ function isNumeric(n) {
 //takes an array of memories and renders memory posts in the memory feed.
 function render_memories(memories) {
 
-  var imageData = null;
-  var display_memory_people = ``;
-
   //clear memory feed 
   $("#all_memories").html('');
   // console.log(memories);
 
   if(!memories) return;
 
-  for (let i = 0; i < memories.length; i++) {
-   
+  for (let i = 0; i < memories.length; i++) {                   // for each memory
+    console.log(memories[i]);
     m_keys = Object.keys(memories[i]);
 
-    walker_get_memory(memories[i]["id"]).then((result) => {
- 
-      var people = [];
-      for (let p = 0; p < result.report[0].who.length; p++) {
-        people.push(result.report[0].who[p]['context']['name']);
-      }
+    $("#all_memories").append(`<div id="memory_${memories[i]['id']}" class="card mb-3"></div>`);               // append card to feed
 
-      console.log(people);
-
-      // console.log(memories[i]["id"]);
-
-      if (m_keys.includes("file_ids") && memories[i]["file_ids"]!= null) {
-        imageData = null;
-        
-        walker_get_file(memories[i]["file_ids"].split(",")[0]).then((result) => {
+    // checking to see if file id exists; making sure it's not null or an empty string
+    if (m_keys.includes("file_ids") && (memories[i]["file_ids"]!= null || memories[i]["file_ids"]!= "")){
+      var imageData = null;
+      var memory_card_image = null;
+      if(Array.isArray(memories[i]["file_ids"]) && memories[i]["file_ids"].length > 0) memory_card_image = memories[i]["file_ids"][0];
+      if(typeof memories[i]["file_ids"] === 'string') memory_card_image = memories[i]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
+      if(memory_card_image){
+        walker_get_file(memory_card_image).then((result) => {
           imageData = result.report[0][0]['context']['base64'];
-          
-          
-          if(imageData) {
-
-            memory_subject = memories[i]["subject"];
-            memory_description = memories[i]["description"];
-            memory_summary = memories[i]["summary"];
-            memory_where = memories[i]["where"];
-            memory_when = memories[i]["when"];
-            memory_date_created = memories[i]["date_created"];
-            memory_date_modified = memories[i]["date_modified"];
-            memory_emotion = [];
-        
-            memory_subject = memory_subject == "" ? "Subject N/A" : memory_subject;
-            memory_description = memory_description == "" ? "Description N/A" : memory_description;
-            memory_summary = memory_summary == "" ? "Summary N/A" : memory_summary;
-            memory_where = memory_where == "" ? "Unknown Location" : memory_where;
-            memory_when = memory_when == "" ? "Date Unknown" : memory_when;
-            memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
-            memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
-        
-            memory_date_created = isValidTimestamp(memory_date_created) ? memory_date_created.replace("T", " ").substring(0, memory_date_created.lastIndexOf(".")): memory_date_created;
-            memory_date_modified = isValidTimestamp(memory_date_modified) ? memory_date_modified.replace("T", " ").substring(0, memory_date_modified.lastIndexOf(".")): memory_date_modified;
-        
-            memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
-            memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
-
-            if(people.length > 0){
-              display_memory_people = `<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${people.toString()}`;
-            }
-            else{
-              display_memory_people = ``;
-            }
-
-            memory_emotion = memories[i]["how"] == "" ? emotions["default"] : emotions[memories[i]["how"]];
-
-            rendered_related_memories = ``;
-
-            if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
-              related_memories = memories[i]["relatedMemories"];
-              related_memories_images = [];
-
-              if(related_memories.length > 0) {
-                    
-                for (let r = 0; r < related_memories.length; r++) {
-                  relatedImageData = null;
-
-                  console.log(related_memories[i]);
-                  rm_keys = Object.keys(related_memories[i]);
-                  if(rm_keys.includes("file_ids") && related_memories[i]["file_ids"]!= null){
-                  walker_get_file(related_memories[i]["file_ids"]).then((result) => {
-                    related_memories_images.push(result.report[0][0]['context']['base64']);
-                    console.log(related_memories_images);
-                  }).catch(function(error) { console.log(error);});
-                }
-                  else{
-                    related_memories_images.push(null);
-                  }
-                }
-              }
-
-
-              rendered_related_memories = render_related_memories(related_memories, related_memories_images);
-
-              // var rm_output = ``;
-              // var rm_content = ``;
-              
-              // console.log(related_memories);
-              
-              // if(related_memories && related_memories.length > 0) {
-                    
-              //   for (let r = 0; r < related_memories.length; r++) {
-              //     relatedImageData = null;
-
-              //     console.log(related_memories[i]);
-              //     if(related_memories[i]["file_ids"] != null){
-              //     walker_get_file(related_memories[i]["file_ids"]).then((result) => {
-              //       relatedImageData = result.report[0][0]['context']['base64'];
-              //       if (relatedImageData){
-              //         rm_content = `<div class="td" style="background-image: url('data:image/jpeg;base64,${relatedImageData}')"></div>`;
-              //       }
-              //     }).catch(function(error) { console.log(error);});
-              //   }
-              //     else{
-              //       rm_content = `${related_memories[r]["subject"]}`;
-              //     }
-            
-              //     if(related_memories[r]["id"]) rm_output = rm_output + `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_content}</div>`;
-              //   }
-            
-              //   rendered_related_memories = `
-              //   <div class="card-footer" style="margin-bottom: 1%;">
-              //   <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-              //   <div class="related_memories">
-              //     <div class="tb">
-              //       <div class="tr">
-              //         ${rm_output}
-              //       </div>
-                    
-              //     </div>
-              //   </div>
-              // </div>
-              //   `;
-              // }
-
-            }
-
-            $("#all_memories").append(
-              `
-              <div class="card mb-3">
-                <img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>
-                <div class="card-body">
-                  <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-                  <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memory_where}${display_memory_people}</small></p>
-                  <p class="card-text"></p>
-                  <p class="card-text">${memories[i]["summary"]}</p>
-                  <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
-                </div>
-                ${rendered_related_memories} 
-              </div> 
-              `
-            );
-          } 
-          // else {
-
-          //   memory_subject = memories[i]["subject"];
-          //   memory_description = memories[i]["description"];
-          //   memory_summary = memories[i]["summary"];
-          //   memory_where = memories[i]["where"];
-          //   memory_when = memories[i]["when"];
-          //   memory_date_created = memories[i]["date_created"];
-          //   memory_date_modified = memories[i]["date_modified"];
-          //   memory_emotion = [];
-        
-          //   memory_subject = memory_subject == "" ? "Subject N/A" : memory_subject;
-          //   memory_description = memory_description == "" ? "Description N/A" : memory_description;
-          //   memory_summary = memory_summary == "" ? "Summary N/A" : memory_summary;
-          //   memory_where = memory_where == "" ? "Unknown Location" : memory_where;
-          //   memory_when = memory_when == "" ? "Date Unknown" : memory_when;
-          //   memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
-          //   memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
-        
-          //   memory_date_created = isValidTimestamp(memory_date_created) ? memory_date_created.replace("T", " ").substring(0, memory_date_created.lastIndexOf(".")): memory_date_created;
-          //   memory_date_modified = isValidTimestamp(memory_date_modified) ? memory_date_modified.replace("T", " ").substring(0, memory_date_modified.lastIndexOf(".")): memory_date_modified;
-        
-          //   memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
-          //   memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
-
-          //   if(people.length > 0){
-          //     display_memory_people = `<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${people.toString()}`;
-          //   }
-          //   else{
-          //     display_memory_people = ``;
-          //   }
-
-          //   memory_emotion = memories[i]["how"] == "" ? emotions["default"] : emotions[memories[i]["how"]];
-
-          //   rendered_related_memories = ``;
-
-          //   if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
-          //     related_memories = memories[i]["relatedMemories"];
-          //     rendered_related_memories = render_related_memories(related_memories);
-          //   }
-
-          //   $("#all_memories").append(
-          //     `
-          //     <div class="card mb-3">
-          //       <div class="card-body">
-          //         <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["summary"]}</a></h5>
-          //         <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memories[i]["where"]}${display_memory_people}</small></p>
-          //         <p class="card-text"></p>
-          //         <p class="card-text">${memories[i]["summary"]}</p>
-          //         <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
-          //       </div>
-          //       ${rendered_related_memories}
-          //     </div> 
-          //     `
-          //   );
-          // }
-        
-        
+          if(imageData) $("#memory_"+memories[i]['id']).prepend(`<img src="data:image/jpeg;base64,${imageData}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>`);
         }).catch(function (error) {
             console.log(error);
         });
-  
-      } 
-      else {
-
-        memory_subject = memories[i]["subject"];
-        memory_description = memories[i]["description"];
-        memory_summary = memories[i]["summary"];
-        memory_where = memories[i]["where"];
-        memory_when = memories[i]["when"];
-        memory_date_created = memories[i]["date_created"];
-        memory_date_modified = memories[i]["date_modified"];
-        memory_emotion = [];
-    
-        memory_subject = memory_subject == "" ? "Subject N/A" : memory_subject;
-        memory_description = memory_description == "" ? "Description N/A" : memory_description;
-        memory_summary = memory_summary == "" ? "Summary N/A" : memory_summary;
-        memory_where = memory_where == "" ? "Unknown Location" : memory_where;
-        memory_when = memory_when == "" ? "Date Unknown" : memory_when;
-        memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
-        memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
-    
-        memory_date_created = isValidTimestamp(memory_date_created) ? memory_date_created.replace("T", " ").substring(0, memory_date_created.lastIndexOf(".")): memory_date_created;
-        memory_date_modified = isValidTimestamp(memory_date_modified) ? memory_date_modified.replace("T", " ").substring(0, memory_date_modified.lastIndexOf(".")): memory_date_modified;
-    
-        memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
-        memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
-        
-        if(people.length > 0){
-          display_memory_people = `<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${people.toString()}`;
-        }
-        else{
-          display_memory_people = ``;
-        }
-
-        memory_emotion = memories[i]["how"] == "" ? emotions["default"] : emotions[memories[i]["how"]];
-
-        rendered_related_memories = ``;
-
-            if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null) {
-              related_memories = memories[i]["relatedMemories"];
-              related_memories_images = [];
-
-              if(related_memories.length > 0) {
-                    
-                for (let r = 0; r < related_memories.length; r++) {
-                  relatedImageData = null;
-
-                  console.log(related_memories[i]);
-                  rm_keys = Object.keys(related_memories[i]);
-                  if(rm_keys.includes("file_ids") && related_memories[i]["file_ids"]!= null){
-                  walker_get_file(related_memories[i]["file_ids"]).then((result) => {
-                    related_memories_images.push(result.report[0][0]['context']['base64']);
-                    console.log(related_memories_images);
-                  }).catch(function(error) { console.log(error);});
-                }
-                  else{
-                    related_memories_images.push(null);
-                  }
-                }
-              }
-              rendered_related_memories = render_related_memories(related_memories, related_memories_images);
-            }
-  
-        $("#all_memories").append(
-          `
-          <div class="card mb-3">
-            <div class="card-body">
-              <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memories[i]["subject"]}</a></h5>
-              <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memories[i]["when"]}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memory_where}${display_memory_people}</small></p>
-              <p class="card-text"></p>
-              <p class="card-text">${memories[i]["summary"]}</p>
-              <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
-            </div>
-            ${rendered_related_memories}
-          </div> 
-          `
-        );
       }
-    
-    }).catch(function (error) {
-      console.log(error);
-    });
+    }
 
-  }
+    memory_subject = memories[i]["subject"];
+    memory_description = memories[i]["description"];
+    memory_summary = memories[i]["summary"];
+    memory_where = memories[i]["where"];
+    memory_when = memories[i]["when"];
+    memory_date_created = memories[i]["date_created"];
+    memory_date_modified = memories[i]["date_modified"];
+    memory_emotion = [];
+    memory_who = [];
+
+    memory_subject = memory_subject == "" ? "Subject N/A" : memory_subject;
+    memory_description = memory_description == "" ? "Description N/A" : memory_description;
+    memory_summary = memory_summary == "" ? "Summary N/A" : memory_summary;
+    memory_where = memory_where == "" ? "Unknown Location" : memory_where;
+    memory_who = Array.isArray(memories[i]["who"]) ? memories[i]["who"] : [];
+    var display_memory_people = ``;
+    if(memory_who.length > 0) display_memory_people = `<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${memory_who.toString()}`;
+    memory_emotion = memories[i]["how"] == "" ? emotions["default"] : emotions[memories[i]["how"]];
+    memory_when = memory_when == "" ? "Date Unknown" : memory_when;
+    memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
+    memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
+    memory_date_created = isValidTimestamp(memory_date_created) ? memory_date_created.replace("T", " ").substring(0, memory_date_created.lastIndexOf(".")): memory_date_created;
+    memory_date_modified = isValidTimestamp(memory_date_modified) ? memory_date_modified.replace("T", " ").substring(0, memory_date_modified.lastIndexOf(".")): memory_date_modified;
+    memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
+    memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
+
+    $("#memory_"+memories[i]['id']).append(`
+      <div class="card-body">
+        <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memory_subject}</a></h5>
+        <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memory_where}${display_memory_people}</small></p>
+        <p class="card-text"></p>
+        <p class="card-text">${memory_summary}</p>
+        <p class="card-text"><small class="text-muted">Last updated on ${memory_date_modified}</small></p>
+      </div>
+    `);
+
+    if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null && Array.isArray(memories[i]["relatedMemories"]) && memories[i]["relatedMemories"].length > 0) {
+      related_memories = memories[i]["relatedMemories"];
+
+      $("#memory_"+memories[i]['id']).append(`
+        <div class="card-footer" style="margin-bottom: 1%;">
+        <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
+        <div class="related_memories" id="relatedMemories_${memories[i]['id']}">
+          <div class="tb">
+            <div class="tr">
+            </div>
+          </div>
+        </div>
+      </div>
+      `);
+
+      for (let r = 0; r < related_memories.length; r++) {
+        var rm_subject = related_memories[r]["subject"];
+        var rm_imageData = null;
+        var rm_card_image = null;
+        rm_keys = Object.keys(related_memories[r]);
+        if (rm_keys.includes("file_ids") && (related_memories[r]["file_ids"]!= null || related_memories[r]["file_ids"]!= "")){
+          if(Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length > 0) rm_card_image = related_memories[r]["file_ids"][0];
+          if(typeof related_memories[r]["file_ids"] === 'string') rm_card_image = related_memories[r]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
+          if(rm_card_image){
+            walker_get_file(rm_card_image).then((result) => {
+              rm_imageData = result.report[0][0]['context']['base64'];
+              rm_subject = related_memories[r]["subject"];
+              if(related_memories[r]["id"]) $("#relatedMemories_"+memories[i]['id']+" .tr").append(`<div class="td" style="background-image: url('data:image/jpeg;base64,${rm_imageData}'); opacity: 0.5;" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`);
+            }).catch(function (error) {
+                console.log(error);
+            });
+          }
+        }
+        if (related_memories[r]["file_ids"] == null || related_memories[r]["file_ids"] == "" || (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length == 0)){
+          if(related_memories[r]["id"]) $("#relatedMemories_"+memories[i]['id']+" .tr").append(`<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`);
+        }
+      }
+
+      // rendered_related_memories = render_related_memories(related_memories);
+      // $("#memory_"+memories[i]['id']).append(rendered_related_memories)
+    }
+
+  }                                                             // end for each memory
 }
 
 
-function render_related_memories(related_memories, related_memories_images) {
+function render_related_memories(related_memories) {
   var output = ``;
   var rm_output = ``;
   var rm_content = ``;
-
-  console.log(related_memories_images);
   
   if(related_memories && related_memories.length > 0) {
         
     for (let r = 0; r < related_memories.length; r++) {
-      if (related_memories_images[i]){
-        rm_content = `<div class="td" style="background-image: url('${related_memories_images[i]}')"></div>`;
-      }
-      else{
-        rm_content = `${related_memories[r]["subject"]}`;
-      }
+      // if (image){
+      //   rm_content = `<div class="td" style="background-image: url('[image_url]')"></div>`;
+      // }
+      // else{
+      //   rm_content = `${related_memories[r]["subject"]}`;
+      // }
 
-      // rm_content = related_memories[r]["subject"];
+      rm_content = related_memories[r]["subject"];
 
       if(related_memories[r]["id"]) rm_output = rm_output + `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_content}</div>`;
     }
@@ -856,33 +664,7 @@ function display_memory_modal(id) {
     }
 
     $('#memoryModal_lastUpdated').text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
-
-    rendered_related_memories = ``;
-
-    related_memories = memory.relatedMemories;
-    related_memories_images = [];
-
-    if(related_memories.length > 0) {
-          
-      for (let r = 0; r < related_memories.length; r++) {
-        relatedImageData = null;
-
-        console.log(related_memories[i]);
-        rm_keys = Object.keys(related_memories[i]);
-        if(rm_keys.includes("file_ids") && related_memories[i]["file_ids"]!= null){
-        walker_get_file(related_memories[i]["file_ids"]).then((result) => {
-          related_memories_images.push(result.report[0][0]['context']['base64']);
-          console.log(related_memories_images);
-        }).catch(function(error) { console.log(error);});
-      }
-        else{
-          related_memories_images.push(null);
-        }
-      }
-    }
-    rendered_related_memories = render_related_memories(related_memories, related_memories_images);
-
-    $('#memoryModal_related_memories').html(rendered_related_memories); //Tim needs to spell this correctly
+    $('#memoryModal_related_memories').html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
 
     persons = [];
     for (let p = 0; p < memory.who.length; p++) {
