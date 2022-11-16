@@ -423,7 +423,7 @@ async function render_memories(memories) {
       m_keys.includes("file_ids") &&
       (memories[i]["file_ids"] != null || memories[i]["file_ids"] != "")
     ) {
-      var imageData = null;
+      var imageUrl = null;
       var memory_card_image = null;
       if (
         Array.isArray(memories[i]["file_ids"]) &&
@@ -540,11 +540,11 @@ async function render_memories(memories) {
           if (rm_card_image) {
             await walker_get_file(rm_card_image)
               .then((result) => {
-                rm_imageData = result.report[0][0]["context"]["base64"];
+                rm_imageData = result.report[0][0]["context"]["url"];
                 rm_subject = related_memories[r]["subject"];
                 if (related_memories[r]["id"])
                   $("#relatedMemories_" + memories[i]["id"] + " .tr").append(
-                    `<div class="td" style="background-image: url('data:image/jpeg;base64,${rm_imageData}'); opacity: 0.5;" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`
+                    `<div class="td" style="background-image: url('${rm_imageData}'); opacity: 0.5;" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`
                   );
               })
               .catch(function (error) {
