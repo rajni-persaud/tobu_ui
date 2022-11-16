@@ -575,6 +575,7 @@ function display_capture_modal() {
   
   //reset the conversation
   chat_messages = [];
+  reset_create_photos(); // resets photos
   create_memory_images = [];
   upload_ids = [];
 
@@ -899,6 +900,12 @@ function chat_sendButton(){
     });
 
 
+}
+
+function reset_create_photos(){
+  document.getElementById("photo_1").innerHTML = ``;
+  document.getElementById("photo_2").innerHTML = ``;
+  document.getElementById("photo_3").innerHTML = ``;
 }
 
 
