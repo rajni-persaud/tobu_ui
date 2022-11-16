@@ -41,38 +41,38 @@ window.speechSynthesis.onvoiceschanged = () => {
 // var query_textbox = $("#query__inputField");
 // var chat_textbox = $("#chatio__inputField");
 
-const artyom = new Artyom();
+// const artyom = new Artyom();
 
-// // Add a single command
-var commandHello = {
-  indexes:["I'd like to add a memory"], // These spoken words will trigger the execution of the command
-  action:function(){ // Action to be executed when a index match with spoken word
-      //artyom.say("I'm Tobu, I can help you remember.");
-      //console.log("hi");
-      display_capture_modal();
-      artyom.fatality();
-  }
-};
+// // // Add a single command
+// var commandHello = {
+//   indexes:["I'd like to add a memory"], // These spoken words will trigger the execution of the command
+//   action:function(){ // Action to be executed when a index match with spoken word
+//       //artyom.say("I'm Tobu, I can help you remember.");
+//       //console.log("hi");
+//       display_capture_modal();
+//       artyom.fatality();
+//   }
+// };
 
-artyom.addCommands(commandHello); 
+// artyom.addCommands(commandHello); 
 
-// // This function activates artyom and will listen all that you say forever (requires https conection, otherwise a dialog will request if you allow the use of the microphone)
-function startContinuousArtyom() {
-  artyom.fatality();// use this to stop 
+// // // This function activates artyom and will listen all that you say forever (requires https conection, otherwise a dialog will request if you allow the use of the microphone)
+// function startContinuousArtyom() {
+//   artyom.fatality();// use this to stop 
 
-  setTimeout(function(){// if you use artyom.fatality , wait 250 ms to initialize again.
-       artyom.initialize({
-          lang:"en-US",// A lot of languages are supported. Read the docs !
-          continuous:true,// Artyom will listen forever
-          listen:true, // Start recognizing
-          debug:true, // Show everything in the console
-          speed:1, // talk normally
-          name: "hey there"
-      }).then(function(){
-          console.log("Ready to work !");
-      });
-  },250);
-}
+//   setTimeout(function(){// if you use artyom.fatality , wait 250 ms to initialize again.
+//        artyom.initialize({
+//           lang:"en-US",// A lot of languages are supported. Read the docs !
+//           continuous:true,// Artyom will listen forever
+//           listen:true, // Start recognizing
+//           debug:true, // Show everything in the console
+//           speed:1, // talk normally
+//           name: "hey there"
+//       }).then(function(){
+//           console.log("Ready to work !");
+//       });
+//   },250);
+// }
 
 // var Chat_UserDictation = chat_artyom.newDictation({
 //     continuous:true, // Enable continuous if HTTPS connection
@@ -361,7 +361,7 @@ function display_memory_feed() {
     });
   }
 
-  startContinuousArtyom();
+  // startContinuousArtyom();
 }
 
 //fetches and renders memories in the feed area based on a query
