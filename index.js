@@ -871,15 +871,15 @@ function save_memory_details() {
 }
 
 function readOutLoud(message) {
-  // speech.text = message;
-  // window.speechSynthesis.speak(speech);
+  speech.text = message;
+  window.speechSynthesis.speak(speech);
 
   // const artyom = new Artyom();
-  if (artyom.speechSupported()) {
-    artyom.say(message);
-  } else {
-    // Unsupported :/
-  }
+  // if (artyom.speechSupported()) {
+  //   artyom.say(message);
+  // } else {
+  //   Unsupported :/
+  // }
 }
 
 var speechRecognition = window.webkitSpeechRecognition;
