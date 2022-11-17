@@ -889,12 +889,15 @@ var chat_inputField = document.getElementById("chatio__inputField");
 var chat_recognition = new speechRecognition();
 var chat_textbox = $("#chatio__inputField");
 var chat_content = "";
+var chat_finalTranscripts = "";
 
 chat_recognition.continuous = true;
+chat_recognition.interimResults = true;
 chat_stat = true;
 
 chat_recognition.onstart = function () {
   console.log("Recording start");
+  chat_finalTranscripts = "";
   document.getElementById("chat_mic-btn").style.color = "#ffffff";
   document.getElementById("chat_mic-bg").style.color = "#365d96";
 };
@@ -910,10 +913,24 @@ chat_recognition.onend = function () {
 };
 
 chat_recognition.onresult = function (event) {
-  var chat_current = event.resultIndex;
-  var chat_transcript = event.results[chat_current][0].transcript;
-  chat_content += chat_transcript;
-  chat_textbox.val(chat_content);
+  // var chat_current = event.resultIndex;
+  // var chat_transcript = event.results[chat_current][0].transcript;
+  // chat_content += chat_transcript;
+  // chat_textbox.val(chat_content);
+
+  var chat_interimTranscripts = "";
+  for(var i=event.resultIndex; i<event.results.length; i++){
+    var chat_transcript = event.results[i][0].transcript;
+    chat_transcript.replace("\n", "<br>");
+    if(event.results[i].isFinal){
+      chat_finalTranscripts += chat_transcript;
+      chat_textbox.val(chat_finalTranscripts);
+    }
+    else{
+      chat_interimTranscripts += chat_transcript;
+      chat_textbox.val(chat_finalTranscripts + chat_interimTranscripts);
+    }
+  }
 };
 
 function chat_mic_click() {
@@ -938,12 +955,15 @@ var query_inputField = document.getElementById("query__inputField");
 var query_recognition = new speechRecognition();
 var query_textbox = $("#query__inputField");
 var query_content = "";
+var query_finalTranscripts = "";
 
 query_recognition.continuous = true;
+query_recognition.interimResults = true;
 query_stat = true;
 
 query_recognition.onstart = function () {
   console.log("Recording start");
+  query_finalTranscripts = "";
   query_textbox.val("");
   document.getElementById("query_mic-btn").style.color = "#ffffff";
   document.getElementById("query_mic-bg").style.color = "#365d96";
@@ -959,10 +979,24 @@ query_recognition.onend = async function () {
 };
 
 query_recognition.onresult = function (event) {
-  var query_current = event.resultIndex;
-  var query_transcript = event.results[query_current][0].transcript;
-  query_content += query_transcript;
-  query_textbox.val(query_content);
+  // var query_current = event.resultIndex;
+  // var query_transcript = event.results[query_current][0].transcript;
+  // query_content += query_transcript;
+  // query_textbox.val(query_content);
+
+  var query_interimTranscripts = "";
+  for(var i=event.resultIndex; i<event.results.length; i++){
+    var query_transcript = event.results[i][0].transcript;
+    query_transcript.replace("\n", "<br>");
+    if(event.results[i].isFinal){
+      query_finalTranscripts += query_transcript;
+      query_textbox.val(query_finalTranscripts);
+    }
+    else{
+      query_interimTranscripts += query_transcript;
+      query_textbox.val(query_finalTranscripts + query_interimTranscripts);
+    }
+  }
 };
 
 function query_mic_click() {
