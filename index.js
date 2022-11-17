@@ -49,7 +49,7 @@ window.speechSynthesis.onvoiceschanged = () => {
 // var query_textbox = $("#query__inputField");
 // var chat_textbox = $("#chatio__inputField");
 
-// const artyom = new Artyom();
+const artyom = new Artyom();
 
 // // // Add a single command
 // var commandHello = {
@@ -901,11 +901,11 @@ function save_memory_details() {
 
 function readOutLoud(message) {
   speech.text = message;
-  window.speechSynthesis.speak(speech);
+  // window.speechSynthesis.speak(speech);
 
   // const artyom = new Artyom();
   // if (artyom.speechSupported()) {
-  //   artyom.say(message);
+    artyom.say(message);
   // } else {
   //   Unsupported :/
   // }
