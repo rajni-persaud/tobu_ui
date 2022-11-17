@@ -614,6 +614,8 @@ function render_related_memories(related_memories) {
 async function ask_tobu() {
   //close this modal
   $("#ask_tobu_modal").modal("hide");
+  //clear memory feed when ask_tobu modal closes so that it doesn't append to all memories
+  $("#all_memories").html("");
   await display_memory_feed();
 }
 
@@ -940,6 +942,7 @@ query_stat = true;
 
 query_recognition.onstart = function () {
   console.log("Recording start");
+  query_textbox.val("");
   document.getElementById("query_mic-btn").style.color = "#ffffff";
   document.getElementById("query_mic-bg").style.color = "#365d96";
 };
@@ -950,7 +953,6 @@ query_recognition.onend = async function () {
   document.getElementById("query_mic-btn").style.color = "#000000";
   document.getElementById("query_mic-bg").style.color = "#ffffff";
   query_content = "";
-  query_textbox.val(chat_content);
   query_stat = true;
 };
 
