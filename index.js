@@ -329,6 +329,34 @@ var file_upload = false;
 // get input from query field
 var query_inputField = document.getElementById("query__inputField");
 
+function start_listening(){
+  var speechRecognizer = new webkitSpeechRecognition();
+  speechRecognizer.continuous = true;
+  speechRecognizer.interimResults = true;
+  speechRecognizer.start();
+  
+  var finalTranscripts = "";
+  speechRecognizer.onresult = function(event){
+      var interimTranscripts = "";
+      for(var i=event.resultIndex; i<event.results.length; i++){
+          var transcript = event.results[i][0].transcript;
+          transcript.replace("\n", "<br>");
+          if(event.results[i].isFinal){
+              finalTranscripts += transcript;
+          }
+          else{
+              interimTranscripts += transcript;
+              console.log("You said: "+interimTranscripts);
+          }
+      }
+
+      if(interimTranscripts.includes("create") && interimTranscripts.includes("memory") && interimTranscripts.includes("hi")){
+          speechRecognizer.stop();
+          display_capture_modal();
+      }
+  };
+}
+
 //fetches and renders memories in the feed area
 async function display_memory_feed() {
   // clear memory feed again before displaying anything
@@ -378,6 +406,7 @@ async function display_memory_feed() {
   }
 
   // startContinuousArtyom();
+  start_listening();
 }
 
 //fetches and renders memories in the feed area based on a query
