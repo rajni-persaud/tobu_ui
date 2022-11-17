@@ -1407,7 +1407,8 @@ function walker_update_memory(id, file_ids = [], file_name = "") {
       "when": "${document.getElementById("memory_when").value}",
       "where": "${document.getElementById("memory_where").value}",
       "how": "${document.getElementById("memory_how").value}",
-      "file_ids": "${file_ids}"
+      "file_ids": "${file_ids}",
+      "who": ${JSON.stringify(who_selected)}
     }
   }
   `;
@@ -1425,7 +1426,8 @@ function walker_update_memory(id, file_ids = [], file_name = "") {
       "where": "${document.getElementById("memory_where").value}",
       "how": "${document.getElementById("memory_how").value}",
       "file_ids": "${file_ids}",
-      "file_name": "${file_name}"
+      "file_name": "${file_name}".
+      "who": ${JSON.stringify(who_selected)}
     }
   }
   `;
