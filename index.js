@@ -1,12 +1,6 @@
-var sentinel_id = document
-  .getElementById("app-interact")
-  .getAttribute("data-sentinelid");
-var server = document
-  .getElementById("app-interact")
-  .getAttribute("data-server");
-var walker = document
-  .getElementById("app-interact")
-  .getAttribute("data-walkername");
+var sentinel_id = document.getElementById("app-interact").getAttribute("data-sentinelid");
+var server = document.getElementById("app-interact").getAttribute("data-server");
+var walker = document.getElementById("app-interact").getAttribute("data-walkername");
 var token = document.getElementById("app-interact").getAttribute("data-token");
 var last_jid = null;
 
@@ -26,9 +20,7 @@ emotions = {
 emotions_select_values = Object.keys(emotions);
 emotion_select_options = ``;
 for (i = 0; i < emotions_select_values.length - 1; i++) {
-  emotion_select_options =
-    emotion_select_options +
-    `<option value="${emotions_select_values[i]}">${emotions_select_values[i]}</option>`;
+  emotion_select_options = emotion_select_options + `<option value="${emotions_select_values[i]}">${emotions_select_values[i]}</option>`;
 }
 
 // Initialize new SpeechSynthesisUtterance object
@@ -364,39 +356,29 @@ async function display_memory_feed() {
   var memories = [];
 
   if (query_inputField.value) {
-    walker_get_memories(query_inputField.value)
-      .then(async (result) => {
-        memories = result.report[0];
-
-        if (memories.length > 0) {
-          display_askTobu_alert(memories.length, query_inputField.value);
+    walker_get_memories(query_inputField.value).then(async (result) => {
+      memories = result.report[0];
+      if (memories.length > 0) {
+        display_askTobu_alert(memories.length, query_inputField.value);
+        await render_memories(memories);
+      } 
+      else {
+        walker_get_memories().then(async (result) => {
+          memories = result.report[0];
+          display_askTobu_alert(0, query_inputField.value);
           await render_memories(memories);
-        } else {
-          walker_get_memories()
-            .then(async (result) => {
-              memories = result.report[0];
-              display_askTobu_alert(0, query_inputField.value);
-              await render_memories(memories);
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
   } else {
     walker_get_memories()
       .then(async (result) => {
-        memories = result.report[0];
-        memories = result.report[0];
-        memories = result.report[0];
-        memories = result.report[0];
-        memories = result.report[0];
-        memories = result.report[0];
-        memories = result.report[0];
-        memories = result.report[0];
         memories = result.report[0];
         await render_memories(memories);
       })
@@ -445,36 +427,25 @@ async function render_memories(memories) {
     console.log(memories[i]);
     m_keys = Object.keys(memories[i]);
 
-    $("#all_memories").append(
-      `<div id="memory_${memories[i]["id"]}" class="card mb-3"></div>`
-    ); // append card to feed
+    $("#all_memories").append(`<div id="memory_${memories[i]["id"]}" class="card mb-3"></div>`); // append card to feed
 
     // checking to see if file id exists; making sure it's not null or an empty string
-    if (
-      m_keys.includes("file_ids") &&
-      (memories[i]["file_ids"] != null || memories[i]["file_ids"] != "")
-    ) {
+    if (m_keys.includes("file_ids") && (memories[i]["file_ids"] != null || memories[i]["file_ids"] != "")) {
       var imageUrl = null;
       var memory_card_image = null;
-      if (
-        Array.isArray(memories[i]["file_ids"]) &&
-        memories[i]["file_ids"].length > 0
-      )
-        memory_card_image = memories[i]["file_ids"][0];
-      if (typeof memories[i]["file_ids"] === "string")
-        memory_card_image = memories[i]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
+      if (Array.isArray(memories[i]["file_ids"]) && memories[i]["file_ids"].length > 0) memory_card_image = memories[i]["file_ids"][0];
+      if (typeof memories[i]["file_ids"] === "string") memory_card_image = memories[i]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
       if (memory_card_image) {
-        await walker_get_file(memory_card_image)
-          .then((result) => {
+        await walker_get_file(memory_card_image).then((result) => {
             imageUrl = result.report[0][0]["context"]["url"];
             if (imageUrl)
               $("#memory_" + memories[i]["id"]).prepend(
                 `<img src="${imageUrl}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>`
               );
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
       }
     }
 
@@ -489,37 +460,20 @@ async function render_memories(memories) {
     memory_who = [];
 
     memory_subject = memory_subject == "" ? "Subject N/A" : memory_subject;
-    memory_description =
-      memory_description == "" ? "Description N/A" : memory_description;
+    memory_description = memory_description == "" ? "Description N/A" : memory_description;
     memory_summary = memory_summary == "" ? "Summary N/A" : memory_summary;
     memory_where = memory_where == "" ? "Unknown Location" : memory_where;
     memory_who = Array.isArray(memories[i]["who"]) ? memories[i]["who"] : [];
     var display_memory_people = ``;
-    if (memory_who.length > 0)
-      display_memory_people = `<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${memory_who.toString()}`;
-    memory_emotion =
-      memories[i]["how"] == ""
-        ? emotions["default"]
-        : emotions[memories[i]["how"]];
+    if(memory_who.length > 0) display_memory_people = `<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${memory_who.toString()}`;
+    memory_emotion = memories[i]["how"] == "" ? emotions["default"] : emotions[memories[i]["how"]];
     memory_when = memory_when == "" ? "Date Unknown" : memory_when;
-    memory_date_created =
-      memory_date_created == "" ? memory_when : memory_date_created;
-    memory_date_modified =
-      memory_date_modified == "" ? memory_date_created : memory_date_modified;
-    memory_date_created = isValidTimestamp(memory_date_created)
-      ? memory_date_created
-          .replace("T", " ")
-          .substring(0, memory_date_created.lastIndexOf("."))
-      : memory_date_created;
-    memory_date_modified = isValidTimestamp(memory_date_modified)
-      ? memory_date_modified
-          .replace("T", " ")
-          .substring(0, memory_date_modified.lastIndexOf("."))
-      : memory_date_modified;
-    memory_date_created =
-      memory_date_created == "" ? memory_when : memory_date_created;
-    memory_date_modified =
-      memory_date_modified == "" ? memory_date_created : memory_date_modified;
+    memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
+    memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
+    memory_date_created = isValidTimestamp(memory_date_created) ? memory_date_created.replace("T", " ").substring(0, memory_date_created.lastIndexOf(".")): memory_date_created;
+    memory_date_modified = isValidTimestamp(memory_date_modified) ? memory_date_modified.replace("T", " ").substring(0, memory_date_modified.lastIndexOf(".")): memory_date_modified;
+    memory_date_created = memory_date_created == "" ? memory_when : memory_date_created;
+    memory_date_modified = memory_date_modified == "" ? memory_date_created : memory_date_modified;
 
     $("#memory_" + memories[i]["id"]).append(`
       <div class="card-body">
@@ -531,12 +485,7 @@ async function render_memories(memories) {
       </div>
     `);
 
-    if (
-      m_keys.includes("relatedMemories") &&
-      memories[i]["relatedMemories"] != null &&
-      Array.isArray(memories[i]["relatedMemories"]) &&
-      memories[i]["relatedMemories"].length > 0
-    ) {
+    if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null && Array.isArray(memories[i]["relatedMemories"]) && memories[i]["relatedMemories"].length > 0) {
       related_memories = memories[i]["relatedMemories"];
 
       $("#memory_" + memories[i]["id"]).append(`
@@ -556,43 +505,28 @@ async function render_memories(memories) {
         var rm_imageData = null;
         var rm_card_image = null;
         rm_keys = Object.keys(related_memories[r]);
-        if (
-          rm_keys.includes("file_ids") &&
-          (related_memories[r]["file_ids"] != null ||
-            related_memories[r]["file_ids"] != "")
-        ) {
-          if (
-            Array.isArray(related_memories[r]["file_ids"]) &&
-            related_memories[r]["file_ids"].length > 0
-          )
-            rm_card_image = related_memories[r]["file_ids"][0];
-          if (typeof related_memories[r]["file_ids"] === "string")
-            rm_card_image = related_memories[r]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
+        if (rm_keys.includes("file_ids") && (related_memories[r]["file_ids"] != null || related_memories[r]["file_ids"] != "")) {
+          if (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length > 0) rm_card_image = related_memories[r]["file_ids"][0];
+          if (typeof related_memories[r]["file_ids"] === "string") rm_card_image = related_memories[r]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
           if (rm_card_image) {
-            await walker_get_file(rm_card_image)
-              .then((result) => {
-                rm_imageData = result.report[0][0]["context"]["url"];
-                rm_subject = related_memories[r]["subject"];
-                if (related_memories[r]["id"])
-                  $("#relatedMemories_" + memories[i]["id"] + " .tr").append(
-                    `<div class="td" style="background-image: url('${rm_imageData}'); opacity: 0.5;" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`
-                  );
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
+            await walker_get_file(rm_card_image).then((result) => {
+              rm_imageData = result.report[0][0]["context"]["url"];
+              rm_subject = related_memories[r]["subject"];
+              if (related_memories[r]["id"])
+                $("#relatedMemories_" + memories[i]["id"] + " .tr").append(
+                  `<div class="td" style="background-image: url('${rm_imageData}'); opacity: 0.5;" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`
+                );
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
           }
         }
-        if (
-          related_memories[r]["file_ids"] == null ||
-          related_memories[r]["file_ids"] == "" ||
-          (Array.isArray(related_memories[r]["file_ids"]) &&
-            related_memories[r]["file_ids"].length == 0)
-        ) {
+        if (related_memories[r]["file_ids"] == null || related_memories[r]["file_ids"] == "" || (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length == 0)) {
           if (related_memories[r]["id"])
-            $("#relatedMemories_" + memories[i]["id"] + " .tr").append(
-              `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`
-            );
+          $("#relatedMemories_" + memories[i]["id"] + " .tr").append(
+            `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`
+          );
         }
       }
 
@@ -682,20 +616,18 @@ async function display_capture_modal() {
   create_memory_images = [];
   upload_ids = [];
 
-  await walker_yield_clear()
-    .then((result) => {
+  await walker_yield_clear().then((result) => {
       $("#createMemoryModal").modal("show");
 
-      walker_run_talk("talk", "Document a memory", upload_ids, extension)
-        .then((result) => {
-          chat_messages.push(["bot", result.report[0]["response"]]);
-          readOutLoud(result.report[0]["response"]);
+      walker_run_talk("talk", "Document a memory", upload_ids, extension).then((result) => {
+        chat_messages.push(["bot", result.report[0]["response"]]);
+        readOutLoud(result.report[0]["response"]);
 
-          update_messages();
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+        update_messages();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
     })
     .catch(function (error) {
       console.log(error);
@@ -708,21 +640,10 @@ async function display_memory_modal(id) {
   memory_display_photos = [];
   file_upload = false;
   edit_memory_ids = [];
-  await walker_get_memory(id)
-    .then(async (result) => {
-      memory = result.report[0];
-      memory = result.report[0];
-      memory = result.report[0];
-      memory = result.report[0];
-      memory = result.report[0];
-      memory = result.report[0];
-      memory = result.report[0];
-      memory = result.report[0];
-      memory = result.report[0];
-      memory = result.report[0];
-      memory = result.report[0];
+  await walker_get_memory(id).then(async (result) => {
+    memory = result.report[0];
 
-      console.log(memory.file_ids);
+    console.log(memory.file_ids);
 
       if (memory.file_ids && memory.file_ids.length > 0) {
         // edit_memory_ids = memory.file_ids;
@@ -730,7 +651,7 @@ async function display_memory_modal(id) {
         if (memory.file_ids[0].split(",")[0]) {
           await walker_get_file(memory.file_ids).then((result) => {
             $("#memoryModal_image").html(
-              `<img src="data:image/png;base64,${result["report"][0][0]["context"]["base64"]}" class="card-img-top" alt="...">`
+              `<img src="${result.report[0][0]["context"]["url"]}" class="card-img-top" alt="...">`
             );
           });
         }
@@ -740,27 +661,15 @@ async function display_memory_modal(id) {
           for (let p = 0; p < memory_images_arr.length; p++) {
             console.log(memory_images_arr[p]);
             await walker_get_file(memory_images_arr[p]).then((result) => {
-              memory_display_photos.push(
-                result["report"][0][0]["context"]["base64"]
-              );
-              display_memory_photos(
-                memory.id,
-                memory_images_arr[p],
-                memory_display_photos
-              );
+              memory_display_photos.push(result.report[0][0]["context"]["url"]);
+              display_memory_photos(memory.id, memory_images_arr[p], memory_display_photos);
             });
           }
         } else {
           console.log(memory.file_ids);
           await walker_get_file(memory.file_ids).then((result) => {
-            memory_display_photos.push(
-              result["report"][0][0]["context"]["base64"]
-            );
-            display_memory_photos(
-              memory.id,
-              memory.file_ids,
-              memory_display_photos
-            );
+            memory_display_photos.push(result.report[0][0]["context"]["url"]);
+            display_memory_photos(memory.id, memory.file_ids, memory_display_photos);
           });
         }
 
@@ -782,25 +691,13 @@ async function display_memory_modal(id) {
       $("#memoryModal_where").text(memory.where);
       $("#memoryModal_description").text(memory.description);
       if (memory.how == "") {
-        $("#memoryModal_how").html(
-          `<i class="fa ${emotions["default"][0]}" style="color: ${emotions["default"][1]};"></i>`
-        );
+        $("#memoryModal_how").html(`<i class="fa ${emotions["default"][0]}" style="color: ${emotions["default"][1]};"></i>`);
       } else {
-        $("#memoryModal_how").html(
-          `<i class="fa ${emotions[memory.how][0]}" style="color: ${
-            emotions[memory.how][1]
-          };"></i>`
-        );
+        $("#memoryModal_how").html(`<i class="fa ${emotions[memory.how][0]}" style="color: ${emotions[memory.how][1]};"></i>`);
       }
 
-      $("#memoryModal_lastUpdated").text(
-        `Last updated on ${memory.date_modified
-          .replace("T", " ")
-          .substring(0, memory.date_modified.lastIndexOf("."))}`
-      );
-      $("#memoryModal_related_memories").html(
-        render_related_memories(memory.relatedMemories)
-      ); //Tim needs to spell this correctly
+      $("#memoryModal_lastUpdated").text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
+      $("#memoryModal_related_memories").html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
 
       persons = [];
       for (let p = 0; p < memory.who.length; p++) {
@@ -819,8 +716,7 @@ async function display_memory_modal(id) {
         });
         document.getElementById("memory_subject").value = memory.subject;
         // document.getElementById("memory_category").value = memory.category;
-        document.getElementById("memory_description").value =
-          memory.description;
+        document.getElementById("memory_description").value = memory.description;
         document.getElementById("memory_summary").value = memory.summary;
         document.getElementById("memory_when").value = memory.when;
         document.getElementById("memory_where").value = memory.where;
@@ -833,19 +729,18 @@ async function display_memory_modal(id) {
       });
 
       $("#memoryModal_btn_delete").on("click", function () {
-        walker_delete_memory(memory.id)
-          .then((result) => {
-            //close this modal
-            $("#memoryModal").modal("hide");
-            setTimeout(function () {
-              //resets feed and hide ask_tobu alert
-              display_memory_feed();
-              document.getElementById("ask_tobu_alert").style.display = "none";
-            }, 1500);
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        walker_delete_memory(memory.id).then((result) => {
+          //close this modal
+          $("#memoryModal").modal("hide");
+          setTimeout(function () {
+            //resets feed and hide ask_tobu alert
+            display_memory_feed();
+            document.getElementById("ask_tobu_alert").style.display = "none";
+          }, 1500);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
       });
 
       $("#memoryModal").modal("show");
@@ -860,23 +755,19 @@ function display_memory_photos(memory_id, memory_file_ids, memory_photos) {
   for (let ph = 0; ph < memory_photos.length; ph++) {
     d_memory_photos =
       d_memory_photos +
-      `<div><i class="fas fa-times" style="padding-right: 20px; margin-bottom: 10px;" onclick="delete_memory_photo('${memory_id}', '${memory_file_ids}', '${memory_file_ids}')"></i><img src="data:image/png;base64,${memory_photos[ph]}" style="height: 200px;"></div>`;
+      `<div><i class="fas fa-times" style="padding-right: 20px; margin-bottom: 10px;" onclick="delete_memory_photo('${memory_id}', '${memory_file_ids}', '${memory_file_ids}')"></i><img src="${memory_photos[ph]}" style="height: 200px;"></div>`;
     // display photos above edit form
-    $("#edit_photos").html(
-      `<div class="tb"><div class="tr">${d_memory_photos}</div></div>`
-    );
+    $("#edit_photos").html(`<div class="tb"><div class="tr">${d_memory_photos}</div></div>`);
   }
 }
 
 function delete_memory_photo(memory_id, photo_id, memory_file_ids) {
   // alert(`${memory_id}, ${photo_id}`);
-  delete_photo_from_memory(memory_id, photo_id, memory_file_ids)
-    .then((result) => {})
+  delete_photo_from_memory(memory_id, photo_id, memory_file_ids).then((result) => {})
     .catch(function (error) {
       console.log(error);
     });
-  walker_delete_file(photo_id)
-    .then((result) => {})
+  walker_delete_file(photo_id).then((result) => {})
     .catch(function (error) {
       console.log(error);
     });
@@ -1108,9 +999,7 @@ async function uploadImage(file) {
 async function imageUploaded() {
   var base64String = "";
 
-  var file = document.querySelector("#create_image_input input[type=file]")[
-    "files"
-  ][0];
+  var file = document.querySelector("#create_image_input input[type=file]")["files"][0];
 
   const result = await uploadImage(file).catch((err) => console.log(err));
   const imageUrl = result.url;
@@ -1140,10 +1029,8 @@ async function imageUploaded() {
 
         for (let i = 0; i < create_memory_images.length; i++) {
           a = i + 1;
-          image_src = "data:image/png;base64," + create_memory_images[i];
-          document.getElementById(
-            "photo_" + a
-          ).innerHTML = `<img src="${image_src}" style="height: 200px;">`;
+          image_src = create_memory_images[i];
+          document.getElementById("photo_" + a).innerHTML = `<img src="${image_src}" style="height: 200px;">`;
         }
       })
       .catch(function (error) {
@@ -1159,9 +1046,7 @@ function editImageUploaded() {
 
   var base64String = "";
 
-  var file = document.querySelector("#edit_image_input input[type=file]")[
-    "files"
-  ][0];
+  var file = document.querySelector("#edit_image_input input[type=file]")["files"][0];
 
   extension = file.name;
 
@@ -1174,8 +1059,7 @@ function editImageUploaded() {
     console.log(edit_memory_images);
     // console.log(base64String);
 
-    await walker_run_upload(extension, url)
-      .then((result) => {
+    await walker_run_upload(extension, url).then((result) => {
         console.log(result.report[0][0]["context"]["id"]);
 
         if (edit_memory_images.length > 0) {
@@ -1208,7 +1092,7 @@ function walker_run_talk(name, utterance = "", file_ids = [], file_name = "") {
       "name": "${name}",
       "ctx": {
         "question": "${utterance}", 
-        "file_ids": "${file_ids}",
+        "file_ids": ${JSON.stringify(file_ids)},
         "file_name": "${file_name}"
       }
     }
@@ -1407,7 +1291,7 @@ function walker_update_memory(id, file_ids = [], file_name = "") {
       "when": "${document.getElementById("memory_when").value}",
       "where": "${document.getElementById("memory_where").value}",
       "how": "${document.getElementById("memory_how").value}",
-      "file_ids": "${file_ids}",
+      "file_ids": ${JSON.stringify(file_ids)},
       "who": ${JSON.stringify(who_selected)}
     }
   }
@@ -1425,7 +1309,7 @@ function walker_update_memory(id, file_ids = [], file_name = "") {
       "when": "${document.getElementById("memory_when").value}",
       "where": "${document.getElementById("memory_where").value}",
       "how": "${document.getElementById("memory_how").value}",
-      "file_ids": "${file_ids}",
+      "file_ids": ${JSON.stringify(file_ids)},
       "file_name": "${file_name}".
       "who": ${JSON.stringify(who_selected)}
     }
@@ -1459,7 +1343,7 @@ function delete_photo_from_memory(id, file_id, file_ids) {
     "name": "update_memory",
     "ctx": {
       "id":"${id}",
-      "file_ids": ${file_ids}
+      "file_ids": ${JSON.stringify(file_ids)}
     }
   }
   `;
