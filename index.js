@@ -646,38 +646,22 @@ async function display_memory_modal(id) {
       if (memory.file_ids && memory.file_ids.length > 0) {
         // edit_memory_ids = memory.file_ids;
         // console.log(memory.file_ids);
-        if (memory.file_ids[0].split(",")[0]) {
-          await walker_get_file(memory.file_ids).then((result) => {
+        if (memory.file_ids[0]) {
+          await walker_get_file(memory.file_ids[0]).then((result) => {
             $("#memoryModal_image").html(
               `<img src="${result.report[0][0]["context"]["url"]}" class="card-img-top" alt="...">`
             );
           });
         }
 
-        if (memory.file_ids[0].includes(",")) {
-          var memory_images_arr = memory.file_ids[0].split(",");
-          for (let p = 0; p < memory_images_arr.length; p++) {
-            console.log(memory_images_arr[p]);
-            await walker_get_file(memory_images_arr[p]).then((result) => {
-              memory_display_photos.push(result.report[0][0]["context"]["url"]);
-              display_memory_photos(memory.id, memory_images_arr[p], memory_display_photos);
-            });
-          }
-        } else {
-          console.log(memory.file_ids);
-          await walker_get_file(memory.file_ids).then((result) => {
+        var memory_images_arr = memory.file_ids;
+        for (let p = 0; p < memory_images_arr.length; p++) {
+          console.log(memory_images_arr[p]);
+          await walker_get_file(memory_images_arr[p]).then((result) => {
             memory_display_photos.push(result.report[0][0]["context"]["url"]);
-            display_memory_photos(memory.id, memory.file_ids, memory_display_photos);
+            display_memory_photos(memory.id, memory_images_arr[p], memory_display_photos);
           });
         }
-
-        // for (let p = 0; p < memory.file_ids.length; p++) {
-        //   console.log(memory.file_ids[p]);
-        //   walker_get_file(memory.file_ids[p]).then((result) => {
-        //     memory_display_photos.push(result["report"][0][0]['context']['base64']);
-        //     display_memory_photos(memory.file_ids[p], memory_display_photos);
-        //   })
-        // }
       } else {
         $("#memoryModal_image").html(" ");
       }
@@ -1307,7 +1291,7 @@ function walker_update_memory(id, file_ids = [], file_name = "") {
       "where": "${document.getElementById("memory_where").value}",
       "how": "${document.getElementById("memory_how").value}",
       "file_ids": ${JSON.stringify(file_ids)},
-      "file_name": "${file_name}".
+      "file_name": "${file_name}",
       "who": ${JSON.stringify(who_selected)}
     }
   }
