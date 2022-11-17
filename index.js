@@ -331,6 +331,8 @@ var query_inputField = document.getElementById("query__inputField");
 
 //fetches and renders memories in the feed area
 async function display_memory_feed() {
+  // clear memory feed again before displaying anything
+  $("#all_memories").html("");
   var memories = [];
 
   if (query_inputField.value) {
