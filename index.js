@@ -644,7 +644,7 @@ async function display_memory_modal(id) {
     console.log(memory.file_ids);
 
       if (memory.file_ids && memory.file_ids.length > 0) {
-        // edit_memory_ids = memory.file_ids;
+          edit_memory_ids = memory.file_ids;
         // console.log(memory.file_ids);
         if (memory.file_ids[0]) {
           await walker_get_file(memory.file_ids[0]).then((result) => {
@@ -1023,12 +1023,16 @@ async function imageUploaded() {
   reader.readAsDataURL(file);
 }
 
-function editImageUploaded() {
+async function editImageUploaded() {
   file_upload = true;
 
   var base64String = "";
 
   var file = document.querySelector("#edit_image_input input[type=file]")["files"][0];
+
+  const result = await uploadImage(file).catch((err) => console.log(err));
+  const imageUrl = result.url;
+  console.log({ imageUrl });
 
   extension = file.name;
 
@@ -1041,7 +1045,7 @@ function editImageUploaded() {
     console.log(edit_memory_images);
     // console.log(base64String);
 
-    await walker_run_upload(extension, url).then((result) => {
+    await walker_run_upload(extension, imageUrl).then((result) => {
         console.log(result.report[0][0]["context"]["id"]);
 
         if (edit_memory_images.length > 0) {
