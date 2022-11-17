@@ -311,10 +311,8 @@ document.getElementById("app-interact").parentNode.innerHTML = `
 var chat_messages = [];
 var create_memory_images = [];
 var upload_ids = [];
-upload_ids = new Array();
 var edit_memory_images = [];
 var edit_memory_ids = [];
-edit_memory_ids = new Array();
 var extension = "";
 var file_upload = false;
 
@@ -1029,7 +1027,7 @@ async function imageUploaded() {
 
         for (let i = 0; i < create_memory_images.length; i++) {
           a = i + 1;
-          image_src = create_memory_images[i];
+          image_src = "data:image/png;base64," + create_memory_images[i];
           document.getElementById("photo_" + a).innerHTML = `<img src="${image_src}" style="height: 200px;">`;
         }
       })
@@ -1063,7 +1061,6 @@ function editImageUploaded() {
         console.log(result.report[0][0]["context"]["id"]);
 
         if (edit_memory_images.length > 0) {
-          // edit_memory_ids = new Array(result.report[0][0]['context']['id']);
           edit_memory_ids.push(result.report[0][0]["context"]["id"]);
           console.log(edit_memory_ids);
         }
