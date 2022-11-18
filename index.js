@@ -315,6 +315,8 @@ var edit_memory_images = [];
 var edit_memory_ids = [];
 var extension = "";
 var file_upload = false;
+var current_memory_photos = [];
+var current_memory_id = "";
 
 // get input from query field
 var query_inputField = document.getElementById("query__inputField");
@@ -632,14 +634,27 @@ async function display_capture_modal() {
     });
 }
 
+async function get_photo_url(memory_photo_ids){
+  $("#edit_photos").html(``);
+  current_memory_photos = [];
+  for (let p = 0; p < memory_photo_ids.length; p++) {
+    console.log(memory_photo_ids[p]);
+    await walker_get_file(memory_photo_ids[p]).then((result) => {
+      current_memory_photos.push(result.report[0][0]["context"]["url"]);
+      display_memory_photos(memory.id, memory_photo_ids[p], current_memory_photos);
+    });
+  }
+}
+
 //displays the detailed modal of the memory
 async function display_memory_modal(id) {
   memory = [];
-  memory_display_photos = [];
+  current_memory_photos = [];
   file_upload = false;
   edit_memory_ids = [];
   await walker_get_memory(id).then(async (result) => {
     memory = result.report[0];
+    current_memory_id = id;
 
     console.log(memory.file_ids);
 
@@ -653,15 +668,7 @@ async function display_memory_modal(id) {
             );
           });
         }
-
-        var memory_images_arr = memory.file_ids;
-        for (let p = 0; p < memory_images_arr.length; p++) {
-          console.log(memory_images_arr[p]);
-          await walker_get_file(memory_images_arr[p]).then((result) => {
-            memory_display_photos.push(result.report[0][0]["context"]["url"]);
-            display_memory_photos(memory.id, memory_images_arr[p], memory_display_photos);
-          });
-        }
+        get_photo_url(edit_memory_ids);
       } else {
         $("#memoryModal_image").html(" ");
       }
@@ -744,11 +751,16 @@ function display_memory_photos(memory_id, memory_file_ids, memory_photos) {
 }
 
 function delete_memory_photo(memory_id, photo_id, memory_file_ids) {
-  // alert(`${memory_id}, ${photo_id}`);
-  delete_photo_from_memory(memory_id, photo_id, memory_file_ids).then((result) => {})
-    .catch(function (error) {
-      console.log(error);
-    });
+  if (Array.isArray(memory_file_ids)) {
+    memory_file_ids.remove(photo_id);
+  }
+  update_file_id(memory_id, memory_file_ids).then((result) => {
+    get_photo_url(memory_file_ids);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  
   walker_delete_file(photo_id).then((result) => {})
     .catch(function (error) {
       console.log(error);
@@ -1024,6 +1036,7 @@ async function imageUploaded() {
 }
 
 async function editImageUploaded() {
+  $("#edit_photos").html(``);
   file_upload = true;
 
   var base64String = "";
@@ -1041,6 +1054,7 @@ async function editImageUploaded() {
   reader.onload = async function () {
     base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
     imageBase64Stringsep = base64String;
+    $("#edit_photos").html(``);
     edit_memory_images.push(base64String);
     console.log(edit_memory_images);
     // console.log(base64String);
@@ -1050,6 +1064,8 @@ async function editImageUploaded() {
 
         if (edit_memory_images.length > 0) {
           edit_memory_ids.push(result.report[0][0]["context"]["id"]);
+          update_file_id(current_memory_id, edit_memory_ids).then((result) => {}).catch(function (error) {console.log(error);});
+          get_photo_url(edit_memory_ids);
           console.log(edit_memory_ids);
         }
       })
@@ -1059,6 +1075,30 @@ async function editImageUploaded() {
   };
 
   reader.readAsDataURL(file);
+}
+
+function update_file_id(memory_id, file_ids){
+  // This function updates only the file id in a given memory
+  query = `
+  {
+    "name": "update_memory",
+    "ctx": {
+      "id":"${memory_id}",
+      "file_ids": ${JSON.stringify(file_ids)}
+    }
+  }
+  `;
+
+  return fetch(`${server}/js/walker_run`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `token ${token}`,
+    },
+    body: query,
+  }).then(function (result) {
+    return result.json();
+  });
 }
 
 function walker_run_talk(name, utterance = "", file_ids = [], file_name = "") {
@@ -1301,37 +1341,6 @@ function walker_update_memory(id, file_ids = [], file_name = "") {
   }
   `;
   }
-
-  return fetch(`${server}/js/walker_run`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `token ${token}`,
-    },
-    body: query,
-  }).then(function (result) {
-    return result.json();
-  });
-}
-
-function delete_photo_from_memory(id, file_id, file_ids) {
-  if (Array.isArray(file_ids)) {
-    removeItem(file_id, file_ids);
-  }
-
-  if (typeof file_ids === "string" && file_ids === file_id) {
-    file_ids = null;
-  }
-
-  query = `
-  {
-    "name": "update_memory",
-    "ctx": {
-      "id":"${id}",
-      "file_ids": ${JSON.stringify(file_ids)}
-    }
-  }
-  `;
 
   return fetch(`${server}/js/walker_run`, {
     method: "POST",
