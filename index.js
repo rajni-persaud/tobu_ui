@@ -379,8 +379,13 @@ async function display_memory_feed() {
   } else {
     walker_get_memories()
       .then(async (result) => {
-        memories = result.report[0];
-        await render_memories(memories);
+        if(!(result.success)){
+          $("#all_memories").html("We are currently experiencing technical difficulties at the moment. Please try again later. Thank you for your patience");
+        }
+        else{
+          memories = result.report[0];
+          await render_memories(memories);
+        }
       })
       .catch(function (error) {
         console.log(error);
