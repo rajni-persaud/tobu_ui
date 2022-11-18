@@ -641,7 +641,7 @@ async function get_photo_url(memory_photo_ids){
     console.log(memory_photo_ids[p]);
     await walker_get_file(memory_photo_ids[p]).then((result) => {
       current_memory_photos.push(result.report[0][0]["context"]["url"]);
-      display_memory_photos(memory.id, memory_photo_ids[p], current_memory_photos);
+      display_memory_photos(memory.id, memory_photo_ids, current_memory_photos);
     });
   }
 }
@@ -740,31 +740,38 @@ async function display_memory_modal(id) {
 }
 
 function display_memory_photos(memory_id, memory_file_ids, memory_photos) {
+  console.log(memory_file_ids);
   d_memory_photos = ``;
   for (let ph = 0; ph < memory_photos.length; ph++) {
     d_memory_photos =
       d_memory_photos +
-      `<div><i class="fas fa-times" style="padding-right: 20px; margin-bottom: 10px;" onclick="delete_memory_photo('${memory_id}', '${memory_file_ids}', '${memory_file_ids}')"></i><img src="${memory_photos[ph]}" style="height: 200px;"></div>`;
+      `<div><i class="fas fa-times" style="padding-right: 20px; margin-bottom: 10px;" onclick="delete_memory_photo('${memory_id}', '${memory_file_ids[ph]}', '${memory_file_ids}')"></i><img src="${memory_photos[ph]}" style="height: 200px;"></div>`;
     // display photos above edit form
     $("#edit_photos").html(`<div class="tb"><div class="tr">${d_memory_photos}</div></div>`);
   }
 }
 
 function delete_memory_photo(memory_id, photo_id, memory_file_ids) {
+  console.log(memory_file_ids);
+  memory_file_ids = memory_file_ids.split(",");
+  console.log(memory_file_ids);
   if (Array.isArray(memory_file_ids)) {
-    memory_file_ids.remove(photo_id);
+    const delete_index = memory_file_ids.indexOf(photo_id);
+    if (delete_index > -1) memory_file_ids.splice(delete_index, 1);
   }
-  update_file_id(memory_id, memory_file_ids).then((result) => {
-    get_photo_url(memory_file_ids);
+  console.log(memory_file_ids);
+  edit_memory_ids = memory_file_ids;
+  update_file_id(memory_id, edit_memory_ids).then((result) => {
+    get_photo_url(edit_memory_ids);
   })
   .catch(function (error) {
     console.log(error);
   });
   
-  walker_delete_file(photo_id).then((result) => {})
-    .catch(function (error) {
-      console.log(error);
-    });
+  // walker_delete_file(photo_id).then((result) => {})
+  //   .catch(function (error) {
+  //     console.log(error);
+  //   });
 }
 
 function close_edit_modal() {
