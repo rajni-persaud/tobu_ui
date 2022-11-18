@@ -380,7 +380,7 @@ async function display_memory_feed() {
     walker_get_memories()
       .then(async (result) => {
         if(!(result.success)){
-          $("#all_memories").html("We are currently experiencing technical difficulties at the moment. Please try again later. Thank you for your patience");
+          $("#all_memories").html(`<div style="height:75vh; margin:auto; text-align:center; padding: 100px 0;"><i class="fa fa-exclamation-triangle"></i><br><div>We are currently experiencing technical difficulties at the moment. Please try again later. Thank you for your patience</div></div>`);
         }
         else{
           memories = result.report[0];
