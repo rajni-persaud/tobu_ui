@@ -196,7 +196,7 @@ document.getElementById("app-interact").parentNode.innerHTML = `
         <div class="modal-body">
         <!-- <button type="button" class="btn btn-outline-secondary">Add Photo/Video</button> -->
           
-        <div id="create_image_input"><input type="file" name="" id="fileId" onchange="imageUploaded()"></div>
+        <div id="create_image_input"><input type="file" name="" id="create_fileId" onchange="imageUploaded()"></div>
         <br><br>
   
           <div id="photos">
@@ -255,7 +255,7 @@ document.getElementById("app-interact").parentNode.innerHTML = `
           </div>
         </div>
         <div id="memoryModal_edit" style="display: none">
-          <div id="edit_image_input"><input type="file" name="" id="fileId" onchange="editImageUploaded()"></div>
+          <div id="edit_image_input"><input type="file" name="" id="edit_fileId" onchange="editImageUploaded()"></div>
           <div id="edit_photos"></div>
           <form>
             <div class="form-group">
@@ -618,6 +618,7 @@ async function display_capture_modal() {
   //reset the conversation
   chat_messages = [];
   reset_create_photos(); // resets photos
+  $("#create_fileId").val(""); // clear input field
   create_memory_images = [];
   upload_ids = [];
 
@@ -647,6 +648,7 @@ async function get_photo_url(memory_photo_ids){
     await walker_get_file(memory_photo_ids[p]).then((result) => {
       current_memory_photos.push(result.report[0][0]["context"]["url"]);
       display_memory_photos(memory.id, memory_photo_ids, current_memory_photos);
+      $("#edit_fileId").val(""); // clear input field
     });
   }
 }
@@ -703,6 +705,7 @@ async function display_memory_modal(id) {
       });
 
       $("#memoryModal_btn_edit").on("click", function () {
+        $("#edit_fileId").val(""); // clear input field
         $("#memoryModal_title").text("Edit Memory");
 
         $('input[name="memory_who"]').amsifySuggestags({
@@ -1031,6 +1034,7 @@ async function imageUploaded() {
         if (create_memory_images.length > 0) {
           upload_ids.push(result.report[0][0]["context"]["id"]);
           document.getElementById("photos").style.display = "block";
+          $("#create_fileId").val(""); // clear input field
         }
 
         for (let i = 0; i < create_memory_images.length; i++) {
