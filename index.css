@@ -2,6 +2,10 @@ body{
   min-width: 480px;
 }
 
+.transparent {
+  opacity: .5;
+}
+
 nav {
     background-color: #365d96;
   }
@@ -244,4 +248,31 @@ input[type="text"]:focus,
         height: 25vw;
         object-fit: cover;
     }
+}
+
+.loader {
+  border: 5px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 5px solid #3498db;
+  width: 50px;
+  height: 50px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  z-index: 5;
+  position: fixed;
+  margin: 0 auto;
+  top:50%;
+  left:50%;
+  display: none;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

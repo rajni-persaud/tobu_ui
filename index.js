@@ -151,10 +151,8 @@ document.getElementById("app-interact").parentNode.innerHTML = `
 
 <div id="navbarSupportedContent" class="collapse navbar-collapse">
     <ul class="navbar-nav ml-auto">
-    <button type="button" class="btn btn-outline-secondary" onclick="display_capture_modal()" style="
-    background-color: #feb248;"><i class="fa fa-picture-o"></i> Capture a memory</button>
-  <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#ask_tobu_modal"><i class="fa fa-microphone"></i> Ask Tobu</button>
-
+      <button type="button" class="btn btn-outline-secondary" onclick="display_capture_modal()" style="background-color: #feb248;"><i class="fa fa-picture-o"></i> Capture a memory</button>
+      <button type="button" id="ask_tobu_btn" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#ask_tobu_modal"><i class="fa fa-microphone"></i> Ask Tobu</button>
     </ul>
 </div>
 </div>
@@ -303,6 +301,7 @@ document.getElementById("app-interact").parentNode.innerHTML = `
 
 <div id="ask_tobu_alert" class="alert alert-primary alert-dismissible fade show mb-3" role="alert" style="display:none;"></div>
 
+<div class="loader"></div>
 <div id="all_memories"></div>
 
 </div>
@@ -317,6 +316,19 @@ var extension = "";
 var file_upload = false;
 var current_memory_photos = [];
 var current_memory_id = "";
+var loading = true;
+var t = setInterval(function (){
+  if(loading){
+    $("#all_memories").addClass("transparent");
+    $('.loader').show();
+    document.querySelector('#ask_tobu_btn').disabled = true;
+  }
+  else{
+    $("#all_memories").removeClass("transparent");
+    $('.loader').hide();
+    document.querySelector('#ask_tobu_btn').disabled = false;
+  }
+},1000);
 
 // get input from query field
 var query_inputField = document.getElementById("query__inputField");
@@ -351,26 +363,31 @@ function start_listening(){
 
 //fetches and renders memories in the feed area
 async function display_memory_feed() {
+
   // clear memory feed again before displaying anything
   $("#all_memories").html("");
   var memories = [];
 
   if (query_inputField.value) {
     walker_get_memories(query_inputField.value).then(async (result) => {
-      memories = result.report[0];
-      if (memories.length > 0) {
-        display_askTobu_alert(memories.length, query_inputField.value);
-        await render_memories(memories);
-      } 
-      else {
-        walker_get_memories().then(async (result) => {
-          memories = result.report[0];
-          display_askTobu_alert(0, query_inputField.value);
+      if (result.success){
+        memories = result.report[0];
+        if (memories.length > 0) {
+          display_askTobu_alert(memories.length, query_inputField.value);
           await render_memories(memories);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+        } 
+        else {
+          walker_get_memories().then(async (result) => {
+            memories = result.report[0];
+            display_askTobu_alert(0, query_inputField.value);
+            await render_memories(memories);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        }
+      } else{
+        $("#all_memories").html(`<div style="height:75vh; margin:auto; text-align:center; padding: 100px 0;"><i class="fa fa-exclamation-triangle"></i><br><div>We are currently experiencing technical difficulties with the Ask tobu feature. Please try again later. Thank you for your patience</div></div>`);
       }
     })
     .catch(function (error) {
@@ -426,7 +443,7 @@ async function render_memories(memories) {
   // console.log(memories);
 
   if (!memories) return;
-
+  loading = true;
   for (let i = 0; i < memories.length; i++) {
     // for each memory
     console.log(memories[i]);
@@ -539,6 +556,7 @@ async function render_memories(memories) {
       // $("#memory_"+memories[i]['id']).append(rendered_related_memories)
     }
   } // end for each memory
+  loading = false;
 }
 
 function render_related_memories(related_memories) {
