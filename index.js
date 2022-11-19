@@ -231,7 +231,7 @@ document.getElementById("app-interact").parentNode.innerHTML = `
                 </div>
               </div>
               <h5 id="memoryModal_subject" class="card-title" style="margin-bottom: 0px;"></h5>
-              <p class="card-text"><small class="text-muted"><span id="memoryModal_how"></span><span id="memoryModal_date"></span><span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span><span id="memoryModal_where"></span></small></p>
+              <p class="card-text"><small class="text-muted"><span id="memoryModal_how"></span><span id="memoryModal_date"></span><span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span><span id="memoryModal_where"></span><span id="memoryModal_people"></span></small></p>
 
               <p class="card-text"></p>
               <p id="memoryModal_description" class="card-text"></p>
@@ -694,6 +694,7 @@ async function display_memory_modal(id) {
       }
 
       console.log(memory);
+
       $("#memoryModal_title").text(memory.when);
       $("#memoryModal_subject").text(memory.subject);
       $("#memoryModal_date").text(memory.when);
@@ -705,14 +706,19 @@ async function display_memory_modal(id) {
         $("#memoryModal_how").html(`<i class="fa ${emotions[memory.how][0]}" style="color: ${emotions[memory.how][1]};"></i>`);
       }
 
-      $("#memoryModal_lastUpdated").text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
-      $("#memoryModal_related_memories").html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
-
       persons = [];
       for (let p = 0; p < memory.who.length; p++) {
         persons.push(memory.who[p]["context"]["name"]);
       }
 
+      if(persons.length > 0){
+        $("#memoryModal_people").html(`<span><i class="fas fa-user" style="padding-left: 2%;"></i></span>${persons.toString()}`);
+      } else{
+        $("#memoryModal_people").html(``);
+      }
+
+      $("#memoryModal_lastUpdated").text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
+      $("#memoryModal_related_memories").html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
       $("#memoryModal_btn_narrate").on("click", function () {
         readOutLoud(memory.summary);
       });
