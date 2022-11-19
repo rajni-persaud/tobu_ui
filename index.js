@@ -41,7 +41,7 @@ window.speechSynthesis.onvoiceschanged = () => {
 // var query_textbox = $("#query__inputField");
 // var chat_textbox = $("#chatio__inputField");
 
-const artyom = new Artyom();
+// const artyom = new Artyom();
 
 // // // Add a single command
 // var commandHello = {
@@ -189,7 +189,7 @@ document.getElementById("app-interact").parentNode.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
           <p class="modal-title" id="createMemoryModalLabel"> Capture a memory</p>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="display_memory_feed()"><span aria-hidden="true">&times;</span></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick="display_memory_feed()"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body">
         <!-- <button type="button" class="btn btn-outline-secondary">Add Photo/Video</button> -->
@@ -304,50 +304,50 @@ var extension = "";
 var file_upload = false;
 var current_memory_photos = [];
 var current_memory_id = "";
-var loading = true;
-var t = setInterval(function (){
-  if(loading){
-    $("#all_memories").addClass("transparent");
-    $('.loader').show();
-    document.querySelector('#ask_tobu_btn').disabled = true;
-  }
-  else{
-    $("#all_memories").removeClass("transparent");
-    $('.loader').hide();
-    document.querySelector('#ask_tobu_btn').disabled = false;
-  }
-},1000);
+// var loading = true;
+// var t = setInterval(function (){
+//   if(loading){
+//     $("#main_app").addClass("transparent");
+//     $('.loader').show();
+//     //document.querySelector('#ask_tobu_btn').disabled = true;
+//   }
+//   else{
+//     $("#main_app").removeClass("transparent");
+//     $('.loader').hide();
+//     //document.querySelector('#ask_tobu_btn').disabled = false;
+//   }
+// },1000);
 
 // get input from query field
 var query_inputField = document.getElementById("query__inputField");
 
-function start_listening(){
-  var speechRecognizer = new webkitSpeechRecognition();
-  speechRecognizer.continuous = true;
-  speechRecognizer.interimResults = true;
-  speechRecognizer.start();
+// function start_listening(){
+//   var speechRecognizer = new webkitSpeechRecognition();
+//   speechRecognizer.continuous = true;
+//   speechRecognizer.interimResults = true;
+//   speechRecognizer.start();
   
-  var finalTranscripts = "";
-  speechRecognizer.onresult = function(event){
-      var interimTranscripts = "";
-      for(var i=event.resultIndex; i<event.results.length; i++){
-          var transcript = event.results[i][0].transcript;
-          transcript.replace("\n", "<br>");
-          if(event.results[i].isFinal){
-              finalTranscripts += transcript;
-          }
-          else{
-              interimTranscripts += transcript;
-              console.log("You said: "+interimTranscripts);
-          }
-      }
+//   var finalTranscripts = "";
+//   speechRecognizer.onresult = function(event){
+//       var interimTranscripts = "";
+//       for(var i=event.resultIndex; i<event.results.length; i++){
+//           var transcript = event.results[i][0].transcript;
+//           transcript.replace("\n", "<br>");
+//           if(event.results[i].isFinal){
+//               finalTranscripts += transcript;
+//           }
+//           else{
+//               interimTranscripts += transcript;
+//               console.log("You said: "+interimTranscripts);
+//           }
+//       }
 
-      if(interimTranscripts.includes("create") && interimTranscripts.includes("memory") && interimTranscripts.includes("hi")){
-          speechRecognizer.stop();
-          display_capture_modal();
-      }
-  };
-}
+//       if(interimTranscripts.includes("create") && interimTranscripts.includes("memory") && interimTranscripts.includes("hi")){
+//           speechRecognizer.stop();
+//           display_capture_modal();
+//       }
+//   };
+// }
 
 //fetches and renders memories in the feed area
 async function display_memory_feed() {
@@ -398,7 +398,7 @@ async function display_memory_feed() {
   }
 
   // startContinuousArtyom();
-  start_listening();
+  //start_listening();
 }
 
 //fetches and renders memories in the feed area based on a query
@@ -431,7 +431,7 @@ async function render_memories(memories) {
   // console.log(memories);
 
   if (!memories) return;
-  loading = true;
+  showLoader(true);
   for (let i = 0; i < memories.length; i++) {
     // for each memory
     console.log(memories[i]);
@@ -498,92 +498,64 @@ async function render_memories(memories) {
     if (m_keys.includes("relatedMemories") && memories[i]["relatedMemories"] != null && Array.isArray(memories[i]["relatedMemories"]) && memories[i]["relatedMemories"].length > 0) {
       related_memories = memories[i]["relatedMemories"];
 
-      $("#memory_" + memories[i]["id"]).append(`
-        <div class="card-footer" style="margin-bottom: 1%;">
-        <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-        <div class="related_memories" id="relatedMemories_${memories[i]["id"]}">
-          <div class="tb">
-            <div class="tr">
-            </div>
-          </div>
-        </div>
-      </div>
-      `);
-
-      for (let r = 0; r < related_memories.length; r++) {
-        var rm_subject = related_memories[r]["subject"];
-        var rm_imageData = null;
-        var rm_card_image = null;
-        rm_keys = Object.keys(related_memories[r]);
-        if (rm_keys.includes("file_ids") && (related_memories[r]["file_ids"] != null || related_memories[r]["file_ids"] != "")) {
-          if (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length > 0) rm_card_image = related_memories[r]["file_ids"][0];
-          if (typeof related_memories[r]["file_ids"] === "string") rm_card_image = related_memories[r]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
-          if (rm_card_image) {
-            await walker_get_file(rm_card_image).then((result) => {
-              rm_imageData = result.report[0][0]["context"]["url"];
-              rm_subject = related_memories[r]["subject"];
-              if (related_memories[r]["id"])
-                $("#relatedMemories_" + memories[i]["id"] + " .tr").append(
-                  `<div class="td" style="background-image: url('${rm_imageData}'); opacity: 0.5;" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`
-                );
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-          }
-        }
-        if (related_memories[r]["file_ids"] == null || related_memories[r]["file_ids"] == "" || (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length == 0)) {
-          if (related_memories[r]["id"])
-          $("#relatedMemories_" + memories[i]["id"] + " .tr").append(
-            `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_subject}</div>`
-          );
-        }
-      }
-
+      $("#memory_" + memories[i]["id"]).append(await render_related_memories(related_memories, 3));
+      
       // rendered_related_memories = render_related_memories(related_memories);
       // $("#memory_"+memories[i]['id']).append(rendered_related_memories)
     }
   } // end for each memory
-  loading = false;
+  showLoader(false);
 }
 
-function render_related_memories(related_memories) {
-  var output = ``;
-  var rm_output = ``;
-  var rm_content = ``;
-
-  if (related_memories && related_memories.length > 0) {
-    for (let r = 0; r < related_memories.length; r++) {
-      // if (image){
-      //   rm_content = `<div class="td" style="background-image: url('[image_url]')"></div>`;
-      // }
-      // else{
-      //   rm_content = `${related_memories[r]["subject"]}`;
-      // }
-
-      rm_content = related_memories[r]["subject"];
-
-      if (related_memories[r]["id"])
-        rm_output =
-          rm_output +
-          `<div class="td" onclick="display_memory_modal('${related_memories[r]["id"]}')">${rm_content}</div>`;
+async function render_related_memories(related_memories, limit) {
+  var output = `
+  <div class="card-footer" style="margin-bottom: 1%;">
+        <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
+        <div class="related_memories">
+          <div class="tb">
+            <div class="tr">
+  `;
+  
+  for (let r = 0; r < related_memories.length; r++) {
+    if(r < limit) {
+      var rm_subject = related_memories[r]["subject"];
+      var rm_imageData = null;
+      var rm_card_image = null;
+      rm_keys = Object.keys(related_memories[r]);
+      if (rm_keys.includes("file_ids") && (related_memories[r]["file_ids"] != null || related_memories[r]["file_ids"] != "")) {
+        if (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length > 0) rm_card_image = related_memories[r]["file_ids"][0];
+        if (typeof related_memories[r]["file_ids"] === "string") rm_card_image = related_memories[r]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
+        if (rm_card_image) {
+          await walker_get_file(rm_card_image).then((result) => {
+            rm_imageData = result.report[0][0]["context"]["url"];
+            rm_subject = related_memories[r]["subject"];
+            if (related_memories[r]["id"]) {
+              output +=
+                `<div class="td" style="background-image: url('${rm_imageData}');position:relative" onclick="display_memory_modal('${related_memories[r]["id"]}')">
+                <div style="top:0;left:0;width:100%; height:100%; background-color:#000000;opacity:0.6;position:absolute;color:#fff;padding: 2em;font-size: 0.8em;text-align: center;cursor:pointer">
+                ${rm_subject}
+                </div>
+                </div>`
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        }
+      }
+      if (related_memories[r]["file_ids"] == null || related_memories[r]["file_ids"] == "" || (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length == 0)) {
+        if (related_memories[r]["id"]) {
+        output +=
+          `<div class="td" style="position:relative"><div style="top:0;left:0;width:100%; height:100%; background-color:#000000;opacity:0.6;position:absolute;color:#fff;padding: 2em;font-size: 0.8em;text-align: center;cursor:pointer">
+          ${rm_subject}
+          <div>
+          </div>`;
+        }
+      }
     }
-
-    output = `
-    <div class="card-footer" style="margin-bottom: 1%;">
-    <p class="card-text"><small class="text-muted"><span><i class="fa fa-picture-o"></i></span>Related Memories</small></p>
-    <div class="related_memories">
-      <div class="tb">
-        <div class="tr">
-          ${rm_output}
-        </div>
-        
-      </div>
-    </div>
-  </div>
-    `;
   }
 
+  output += `</div></div></div></div></div>`;
   return output;
 }
 
@@ -630,6 +602,7 @@ async function display_capture_modal() {
   upload_ids = [];
 
   await walker_yield_clear().then((result) => {
+      $("#createMemoryModal").modal({backdrop: 'static', keyboard: false});
       $("#createMemoryModal").modal("show");
 
       walker_run_talk("talk", "Document a memory", upload_ids, extension).then((result) => {
@@ -672,6 +645,22 @@ async function display_memory_modal(id) {
   document.getElementById("memoryModal_details").style.display = "block";
   $("#edit_photos").html(``);
 
+  //clear
+  $("#memoryModal_title").text("");
+  $("#memoryModal_subject").text("");
+  $("#memoryModal_date").text("");
+  $("#memoryModal_where").text("");
+  $("#memoryModal_description").text("");
+  $("#memoryModal_how").html("");
+  $("#memoryModal_related_memories").html("");
+  $("#memoryModal_lastUpdated").text("");
+  $("#memoryModal_image").html(" ");
+  $("#memoryModal_people").html(``);
+
+  showLoader(true);
+  $("#memoryModal").modal("show");
+
+  
   await walker_get_memory(id).then(async (result) => {
     memory = result.report[0];
     current_memory_id = id;
@@ -718,7 +707,7 @@ async function display_memory_modal(id) {
       }
 
       $("#memoryModal_lastUpdated").text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
-      $("#memoryModal_related_memories").html(render_related_memories(memory.relatedMemories)); //Tim needs to spell this correctly
+      $("#memoryModal_related_memories").html(await render_related_memories(memory.relatedMemories, 6)); 
       $("#memoryModal_btn_narrate").on("click", function () {
         readOutLoud(memory.summary);
       });
@@ -741,7 +730,7 @@ async function display_memory_modal(id) {
         $('input[name="memory_who"]').amsifySuggestags();
 
         document.getElementById("memoryModal_edit").style.display = "block";
-        document.getElementById("memoryModal_details").style.display = "none";
+        //document.getElementById("memoryModal_details").style.display = "none";
       });
 
       $("#memoryModal_btn_delete").on("click", function () {
@@ -759,7 +748,7 @@ async function display_memory_modal(id) {
         });
       });
 
-      $("#memoryModal").modal("show");
+      showLoader(false);
     })
     .catch(function (error) {
       console.log(error);
@@ -807,7 +796,7 @@ function close_edit_modal() {
   $("#memoryModal").modal("hide");
   // hides ask_tobu alert
   document.getElementById("ask_tobu_alert").style.display = "none";
-  display_memory_feed();
+  // display_memory_feed();
 }
 
 function save_memory_details() {
@@ -815,19 +804,31 @@ function save_memory_details() {
   console.log(who_selected);
   setTimeout(function () {
     close_edit_modal();
+    display_memory_feed();
   }, 1500);
 }
 
 function readOutLoud(message) {
   speech.text = message;
-  // window.speechSynthesis.speak(speech);
+  window.speechSynthesis.speak(speech);
 
   // const artyom = new Artyom();
   // if (artyom.speechSupported()) {
-    artyom.say(message);
+    //artyom.say(message);
   // } else {
   //   Unsupported :/
   // }
+}
+
+function showLoader(show = true) {
+  if(show){
+    $("#glass_case").show();
+    $('.loader').show();
+  }
+  else{
+    $("#glass_case").hide();
+    $('.loader').hide();
+  }
 }
 
 var speechRecognition = window.webkitSpeechRecognition;
@@ -1418,5 +1419,4 @@ async function get_memory_people(memory_id) {
 //     return result.json();
 //   });
 // }
-
 display_memory_feed();

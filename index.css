@@ -1,9 +1,9 @@
 body{
-  min-width: 480px;
+  min-width: 390px;
 }
 
 .transparent {
-  opacity: .5;
+  opacity: .4;
   pointer-events: none;
   cursor: default;
 }
@@ -14,7 +14,8 @@ nav {
   
   .navbar {
     position: fixed;
-    width: 567px;
+    width: 100%;
+    max-width: 567px;
     z-index: 6;
   }
   
@@ -52,12 +53,15 @@ img {
   }
   
   .tb {
-    display: table;
+    /* display: table; */
     width: 100%;
+    text-align: center;
+    overflow-y: auto;
   }
   
   .tr {
-    display: table-row;
+    /* display: inline-grid; */
+    /* grid-template-rows: auto; */
   }
   
   .td {
@@ -72,8 +76,12 @@ img {
   }
   
   .related_memories .td {
-    width: 33.333%;
-    height: 200px;
+    /* display: grid; */
+    /* grid-template-columns: auto auto auto; */
+    /* width: 150px; */
+    /* height: 150px; */
+    /* float: left; */
+    padding: 5.1em;
     border: 2px solid #fff;
     box-sizing: border-box;
     background-color: #f1f1f1;
@@ -191,7 +199,7 @@ input[type="text"]:focus,
   }
   .modal .modal-dialog {
     height: 100%;
-    width: 567px;
+    max-width: 567px;
     margin: 0 auto;
 
   }
@@ -232,6 +240,10 @@ input[type="text"]:focus,
     max-width: 750px;
   }
 
+  .card-img-top {
+    cursor: pointer;
+  }
+
 @media screen and (min-width: 992px) {
     /* #main-content{
         max-width: 80%;
@@ -253,19 +265,31 @@ input[type="text"]:focus,
 }
 
 .loader {
-  border: 5px solid #f3f3f3;
+  border: 5px solid #3498db;
   border-radius: 50%;
-  border-top: 5px solid #3498db;
+  border-top: 5px solid #365d96;
   width: 50px;
   height: 50px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
-  animation: spin 2s linear infinite;
-  z-index: 5;
+  -webkit-animation: spin 1s linear infinite; /* Safari */
+  animation: spin 1s linear infinite;
+  z-index: 10001;
   position: fixed;
   margin: 0 auto;
   top:50%;
-  left:50%;
-  display: none;
+  left: calc(50% - 25px);
+  /* display: none; */
+}
+
+#glass_case {
+  /* display: none; */
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 10000;
+  background-color: #fff;
+  opacity: 0.5;
 }
 
 /* Safari */
