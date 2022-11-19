@@ -677,6 +677,12 @@ async function display_memory_modal(id) {
   current_memory_photos = [];
   file_upload = false;
   edit_memory_ids = [];
+
+  // always show detailed view; hide edit view when memory modal is being displayed
+  document.getElementById("memoryModal_edit").style.display = "none";
+  document.getElementById("memoryModal_details").style.display = "block";
+  $("#edit_photos").html(``);
+
   await walker_get_memory(id).then(async (result) => {
     memory = result.report[0];
     current_memory_id = id;
