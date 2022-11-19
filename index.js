@@ -195,20 +195,8 @@ document.getElementById("app-interact").parentNode.innerHTML = `
         <!-- <button type="button" class="btn btn-outline-secondary">Add Photo/Video</button> -->
           
         <div id="create_image_input"><input type="file" name="" id="create_fileId" onchange="imageUploaded()"></div>
-        <br><br>
-  
-          <div id="photos">
-            <div class="tb">
-              <div class="tr">
-                <div id="photo_1" class="td"></div>
-                <div id="photo_2" class="td"></div>
-                <div id="photo_3" class="td"></div>
-              </div>
-            </div>
-          </div>
-
-          <div id="chatbox"></div>
-
+        <div id="photos"></div>
+        <div id="chatbox"></div>
         </div>
         <div class="modal-footer" style="padding-right: 10%">
         <!-- User input box -->
@@ -635,7 +623,8 @@ function display_askTobu_alert(num_memories, query_value) {
 async function display_capture_modal() {
   //reset the conversation
   chat_messages = [];
-  reset_create_photos(); // resets photos
+  $("#photos").html(``); // resets photos
+  $("#photos").hide();
   $("#create_fileId").val(""); // clear input field
   create_memory_images = [];
   upload_ids = [];
@@ -1005,12 +994,6 @@ function chat_sendButton() {
     });
 }
 
-function reset_create_photos() {
-  document.getElementById("photo_1").innerHTML = ``;
-  document.getElementById("photo_2").innerHTML = ``;
-  document.getElementById("photo_3").innerHTML = ``;
-}
-
 async function uploadImage(file) {
   const cloudName = "dlwqeqp9i";
 
@@ -1061,10 +1044,11 @@ async function imageUploaded() {
           $("#create_fileId").val(""); // clear input field
         }
 
+        c_memory_photos = ``;
         for (let i = 0; i < create_memory_images.length; i++) {
-          a = i + 1;
           image_src = "data:image/png;base64," + create_memory_images[i];
-          document.getElementById("photo_" + a).innerHTML = `<img src="${image_src}" style="height: 200px;">`;
+          c_memory_photos = c_memory_photos + `<div class="td"><img src="${image_src}" style="height: 200px;"></div>`;
+          $("#photos").html(`<div class="tb"><div class="tr">${c_memory_photos}</div></div>`);
         }
       })
       .catch(function (error) {
