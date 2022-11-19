@@ -144,7 +144,7 @@ document.getElementById("app-interact").parentNode.innerHTML = `
 <div class="container">
 <a onclick="location.reload()" class="navbar-brand">
     <!-- Logo Image -->
-    <img src="./images/tobu_logo_w.png" width="30" height="30" alt="" class="d-inline-block align-middle mr-2">
+    <img src="./images/tobu_logo_w.png" width="70" height="30" alt="" class="d-inline-block align-middle mr-2">
 </a>
 
 <button type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span class="navbar-toggler-icon"></span></button>
@@ -488,7 +488,7 @@ async function render_memories(memories) {
 
     $("#memory_" + memories[i]["id"]).append(`
       <div class="card-body">
-        <h5 class="card-title" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memory_subject}</a></h5>
+        <h5 class="card-title truncated" style="margin-bottom: 0px;"><a href="javascript:display_memory_modal('${memories[i]["id"]}')">${memory_subject}</a></h5>
         <p class="card-text"><small class="text-muted"><span><i class="fa ${memory_emotion[0]}" style="color: ${memory_emotion[1]};"></i></span>${memory_when}<span><i class="fas fa-map-marker-alt" style="padding-left: 2%;"></i></span>${memory_where}${display_memory_people}</small></p>
         <p class="card-text"></p>
         <p class="card-text">${memory_summary}</p>
@@ -534,7 +534,7 @@ async function render_related_memories(related_memories, limit) {
               output +=
                 `<div class="td" style="background-image: url('${rm_imageData}');position:relative" onclick="display_memory_modal('${related_memories[r]["id"]}')">
                 <div style="top:0;left:0;width:100%; height:100%; background-color:#000000;opacity:0.6;position:absolute;color:#fff;padding: 2em;font-size: 0.8em;text-align: center;cursor:pointer">
-                ${rm_subject}
+                <div class="truncated-v">${rm_subject}</div>...
                 </div>
                 </div>`
             }
@@ -549,7 +549,7 @@ async function render_related_memories(related_memories, limit) {
         output +=
           `<div class="td" style="position:relative">
             <div style="top:0;left:0;width:100%; height:100%; background-color:#000000;opacity:0.6;position:absolute;color:#fff;padding: 2em;font-size: 0.8em;text-align: center;cursor:pointer" onclick="display_memory_modal('${related_memories[r]["id"]}')">
-            ${rm_subject}
+            <div class="truncated-v">${rm_subject}</div>...
             </div>
           </div>`;
         }
@@ -643,11 +643,11 @@ async function display_memory_modal(id) {
   edit_memory_ids = [];
 
   // always show detailed view; hide edit view when memory modal is being displayed
-  document.getElementById("memoryModal_edit").style.display = "none";
-  document.getElementById("memoryModal_details").style.display = "block";
-  $("#edit_photos").html(``);
+  $("#memoryModal_edit").hide();
+  $("#memoryModal_details").show();
 
   //clear
+  $("#edit_photos").html(``);
   $("#memoryModal_title").text("");
   $("#memoryModal_subject").text("");
   $("#memoryModal_date").text("");
@@ -731,8 +731,8 @@ async function display_memory_modal(id) {
         document.getElementById("memory_who").value = persons.toString();
         $('input[name="memory_who"]').amsifySuggestags();
 
-        document.getElementById("memoryModal_edit").style.display = "block";
-        //document.getElementById("memoryModal_details").style.display = "none";
+        $("#memoryModal_edit").show();
+        $("#memoryModal_details").hide();
       });
 
       $("#memoryModal_btn_delete").on("click", function () {

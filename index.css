@@ -244,6 +244,22 @@ input[type="text"]:focus,
     cursor: pointer;
   }
 
+  .navbar-brand {
+    max-width: 70px;
+  }
+
+  .truncated {
+    width: 450px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .truncated-v {
+    height: 112px;
+    overflow: hidden;
+  }
+
 @media screen and (min-width: 992px) {
     /* #main-content{
         max-width: 80%;
@@ -262,6 +278,16 @@ input[type="text"]:focus,
         height: 25vw;
         object-fit: cover;
     }
+}
+
+
+@media screen and (max-width: 575px) {
+  .navbar-nav > button {
+    margin: 10px 0px;
+  }
+  .navbar-collapse {
+    padding: 2.5em 1em;
+  }
 }
 
 .loader {
