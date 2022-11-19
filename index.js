@@ -546,7 +546,7 @@ async function render_related_memories(related_memories, limit) {
       if (related_memories[r]["file_ids"] == null || related_memories[r]["file_ids"] == "" || (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length == 0)) {
         if (related_memories[r]["id"]) {
         output +=
-          `<div class="td" style="position:relative"><div style="top:0;left:0;width:100%; height:100%; background-color:#000000;opacity:0.6;position:absolute;color:#fff;padding: 2em;font-size: 0.8em;text-align: center;cursor:pointer">
+          `<div class="td" style="position:relative"><div style="top:0;left:0;width:100%; height:100%; background-color:#000000;opacity:0.6;position:absolute;color:#fff;padding: 2em;font-size: 0.8em;text-align: center;cursor:pointer" onclick="display_memory_modal('${related_memories[r]["id"]}')">
           ${rm_subject}
           <div>
           </div>`;
