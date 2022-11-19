@@ -301,6 +301,7 @@ var upload_ids = [];
 var edit_memory_images = [];
 var edit_memory_ids = [];
 var extension = "";
+var current_file_url = "";
 var file_upload = false;
 var current_memory_photos = [];
 var current_memory_id = "";
@@ -606,7 +607,7 @@ async function display_capture_modal() {
       $("#createMemoryModal").modal({backdrop: 'static', keyboard: false});
       $("#createMemoryModal").modal("show");
 
-      walker_run_talk("talk", "Document a memory", upload_ids, extension).then((result) => {
+      walker_run_talk("talk", "Document a memory", upload_ids, current_file_url).then((result) => {
         chat_messages.push(["bot", result.report[0]["response"]]);
         readOutLoud(result.report[0]["response"]);
 
@@ -801,7 +802,7 @@ function close_edit_modal() {
 }
 
 function save_memory_details() {
-  walker_update_memory(memory.id, edit_memory_ids, extension);
+  walker_update_memory(memory.id, edit_memory_ids, current_file_url);
   console.log(who_selected);
   setTimeout(function () {
     close_edit_modal();
@@ -990,7 +991,7 @@ function chat_sendButton() {
 
   update_messages();
 
-  walker_run_talk("talk", utterance, upload_ids, extension)
+  walker_run_talk("talk", utterance, upload_ids, current_file_url)
     .then((result) => {
       chat_messages.push(["bot", result.report[0]["response"]]);
       readOutLoud(result.report[0]["response"]);
@@ -1048,6 +1049,7 @@ async function imageUploaded() {
 
         if (create_memory_images.length > 0) {
           upload_ids.push(result.report[0][0]["context"]["id"]);
+          current_file_url = result.report[0][0]["context"]["url"];
           document.getElementById("photos").style.display = "block";
           $("#create_fileId").val(""); // clear input field
         }
@@ -1096,6 +1098,7 @@ async function editImageUploaded() {
 
         if (edit_memory_images.length > 0) {
           edit_memory_ids.push(result.report[0][0]["context"]["id"]);
+          current_file_url = result.report[0][0]["context"]["url"];
           update_file_id(current_memory_id, edit_memory_ids).then((result) => {}).catch(function (error) {console.log(error);});
           get_photo_url(edit_memory_ids);
           console.log(edit_memory_ids);
@@ -1133,7 +1136,7 @@ function update_file_id(memory_id, file_ids){
   });
 }
 
-function walker_run_talk(name, utterance = "", file_ids = [], file_name = "") {
+function walker_run_talk(name, utterance = "", file_ids = [], file_url = "") {
   //if(file_ids.length > 0) {
   query = `
     {
@@ -1150,7 +1153,7 @@ function walker_run_talk(name, utterance = "", file_ids = [], file_name = "") {
       "ctx": {
         "question": "${utterance}", 
         "file_ids": ${JSON.stringify(file_ids)},
-        "file_name": "${file_name}"
+        "file_url": "${file_url}"
       }
     }
     `;
@@ -1336,7 +1339,7 @@ function walker_delete_file(id) {
   });
 }
 
-function walker_update_memory(id, file_ids = [], file_name = "") {
+function walker_update_memory(id, file_ids = [], file_url = "") {
   query = `
   {
     "name": "update_memory",
@@ -1367,7 +1370,7 @@ function walker_update_memory(id, file_ids = [], file_name = "") {
       "where": "${document.getElementById("memory_where").value}",
       "how": "${document.getElementById("memory_how").value}",
       "file_ids": ${JSON.stringify(file_ids)},
-      "file_name": "${file_name}",
+      "file_url": "${file_url}",
       "who": ${JSON.stringify(who_selected)}
     }
   }
