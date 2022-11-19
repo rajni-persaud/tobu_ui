@@ -4,6 +4,8 @@ body{
 
 .transparent {
   opacity: .5;
+  pointer-events: none;
+  cursor: default;
 }
 
 nav {
