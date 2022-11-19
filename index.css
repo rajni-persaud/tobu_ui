@@ -1,6 +1,6 @@
-/* body{
-    background-color: #ccc;
-} */
+body{
+  min-width: 480px;
+}
 
 nav {
     background-color: #365d96;
