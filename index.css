@@ -248,12 +248,12 @@ input[type="text"]:focus,
     max-width: 70px;
   }
 
-  .truncated {
+  /* .truncated {
     width: 450px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
+  } */
 
   .truncated-v {
     height: 112px;
