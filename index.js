@@ -568,7 +568,7 @@ function display_askTobu_alert(num_memories, query_value) {
       <span aria-hidden="true">&times;</span>
     </button>
     `);
-    document.getElementById("ask_tobu_alert").style.display = "block";
+    //document.getElementById("ask_tobu_alert").style.display = "block";
   } else {
     $("#ask_tobu_alert").html(`
     No results found for: '${query_value}'; displaying all memories
@@ -576,7 +576,7 @@ function display_askTobu_alert(num_memories, query_value) {
       <span aria-hidden="true">&times;</span>
     </button>
     `);
-    document.getElementById("ask_tobu_alert").style.display = "block";
+    //document.getElementById("ask_tobu_alert").style.display = "block";
   }
   // clear query field after displaying alert
   var query_inputField = document.getElementById("query__inputField");
