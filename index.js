@@ -215,7 +215,7 @@ document.getElementById("app-interact").parentNode.innerHTML = `
     <div class="modal-content">
       <div class="modal-header">
         <p class="modal-title" id="memoryModal_title"></p>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="close_edit_modal()"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="close_edit_modal(); shutUp()"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
         <div id="memoryModal_details">
@@ -427,36 +427,32 @@ function isNumeric(n) {
 
 //takes an array of memories and renders memory posts in the memory feed.
 async function render_memories(memories) {
+
   //clear memory feed
   $("#all_memories").html("");
   // console.log(memories);
 
-  if (!memories) return;
-  showLoader(true);
+  if (!memories || memories.length == 0) {
+    return;
+  }
+
   for (let i = 0; i < memories.length; i++) {
     // for each memory
     console.log(memories[i]);
     m_keys = Object.keys(memories[i]);
 
     $("#all_memories").append(`<div id="memory_${memories[i]["id"]}" class="card mb-3"></div>`); // append card to feed
-
-    // checking to see if file id exists; making sure it's not null or an empty string
-    if (m_keys.includes("file_ids") && (memories[i]["file_ids"] != null || memories[i]["file_ids"] != "")) {
+    
+    // checking to see if image_url exists; making sure it's not null or an empty string
+    if (m_keys.includes("image_urls") && (memories[i]["image_urls"] != null || memories[i]["image_urls"] != "")) {
       var imageUrl = null;
       var memory_card_image = null;
-      if (Array.isArray(memories[i]["file_ids"]) && memories[i]["file_ids"].length > 0) memory_card_image = memories[i]["file_ids"][0];
-      if (typeof memories[i]["file_ids"] === "string") memory_card_image = memories[i]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
+      if (Array.isArray(memories[i]["image_urls"]) && memories[i]["image_urls"].length > 0) memory_card_image = memories[i]["image_urls"][0];
+      if (typeof memories[i]["image_urls"] === "string") memory_card_image = memories[i]["image_urls"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
       if (memory_card_image) {
-        await walker_get_file(memory_card_image).then((result) => {
-            imageUrl = result.report[0][0]["context"]["url"];
-            if (imageUrl)
-              $("#memory_" + memories[i]["id"]).prepend(
-                `<img src="${imageUrl}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>`
-              );
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+        $("#memory_" + memories[i]["id"]).prepend(
+          `<img src="${memory_card_image}" class="card-img-top" alt="..." onclick=display_memory_modal('${memories[i]["id"]}')>`
+        );
       }
     }
 
@@ -501,11 +497,9 @@ async function render_memories(memories) {
 
       $("#memory_" + memories[i]["id"]).append(await render_related_memories(related_memories, 3));
       
-      // rendered_related_memories = render_related_memories(related_memories);
-      // $("#memory_"+memories[i]['id']).append(rendered_related_memories)
     }
   } // end for each memory
-  showLoader(false);
+ 
 }
 
 async function render_related_memories(related_memories, limit) {
@@ -523,28 +517,24 @@ async function render_related_memories(related_memories, limit) {
       var rm_imageData = null;
       var rm_card_image = null;
       rm_keys = Object.keys(related_memories[r]);
-      if (rm_keys.includes("file_ids") && (related_memories[r]["file_ids"] != null || related_memories[r]["file_ids"] != "")) {
-        if (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length > 0) rm_card_image = related_memories[r]["file_ids"][0];
-        if (typeof related_memories[r]["file_ids"] === "string") rm_card_image = related_memories[r]["file_ids"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
+      if (rm_keys.includes("image_urls") && (related_memories[r]["image_urls"] != null || related_memories[r]["image_urls"] != "")) {
+        if (Array.isArray(related_memories[r]["image_urls"]) && related_memories[r]["image_urls"].length > 0) rm_card_image = related_memories[r]["image_urls"][0];
+        if (typeof related_memories[r]["image_urls"] === "string") rm_card_image = related_memories[r]["image_urls"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
         if (rm_card_image) {
-          await walker_get_file(rm_card_image).then((result) => {
-            rm_imageData = result.report[0][0]["context"]["url"];
+        
             rm_subject = related_memories[r]["subject"];
             if (related_memories[r]["id"]) {
               output +=
-                `<div class="td" style="background-image: url('${rm_imageData}');position:relative" onclick="display_memory_modal('${related_memories[r]["id"]}')">
+                `<div class="td" style="background-image: url('${rm_card_image}');position:relative" onclick="display_memory_modal('${related_memories[r]["id"]}')">
                 <div style="top:0;left:0;width:100%; height:100%; background-color:#000000;opacity:0.6;position:absolute;color:#fff;padding: 2em;font-size: 0.8em;text-align: center;cursor:pointer">
                 <div class="truncated-v">${rm_subject}</div>...
                 </div>
                 </div>`
             }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+    
         }
       }
-      if (related_memories[r]["file_ids"] == null || related_memories[r]["file_ids"] == "" || (Array.isArray(related_memories[r]["file_ids"]) && related_memories[r]["file_ids"].length == 0)) {
+      if (related_memories[r]["image_urls"] == null || related_memories[r]["image_urls"] == "" || (Array.isArray(related_memories[r]["image_urls"]) && related_memories[r]["image_urls"].length == 0)) {
         if (related_memories[r]["id"]) {
         output +=
           `<div class="td" style="position:relative">
@@ -607,7 +597,7 @@ async function display_capture_modal() {
       $("#createMemoryModal").modal({backdrop: 'static', keyboard: false});
       $("#createMemoryModal").modal("show");
 
-      walker_run_talk("talk", "Document a memory", upload_ids, current_file_url).then((result) => {
+      walker_run_talk("talk", "Document a memory", create_memory_images, current_file_url).then((result) => {
         chat_messages.push(["bot", result.report[0]["response"]]);
         readOutLoud(result.report[0]["response"]);
 
@@ -658,8 +648,12 @@ async function display_memory_modal(id) {
   $("#memoryModal_lastUpdated").text("");
   $("#memoryModal_image").html(" ");
   $("#memoryModal_people").html(``);
+  $("#memoryModal_btn_narrate").off("click");
+  $("#memoryModal_btn_edit").off("click");
+  $("#memoryModal_btn_delete").off("click");
 
   showLoader(true);
+  $("#memoryModal").modal({backdrop: 'static', keyboard: false});
   $("#memoryModal").modal("show");
 
   
@@ -667,18 +661,19 @@ async function display_memory_modal(id) {
     memory = result.report[0];
     current_memory_id = id;
 
-    console.log(memory.file_ids);
 
-      if (memory.file_ids && memory.file_ids.length > 0) {
-          edit_memory_ids = memory.file_ids;
-        // console.log(memory.file_ids);
-        if (memory.file_ids[0]) {
-          await walker_get_file(memory.file_ids[0]).then((result) => {
-            $("#memoryModal_image").html(
-              `<img src="${result.report[0][0]["context"]["url"]}" class="card-img-top" alt="...">`
-            );
-          });
+      if ((memory["image_urls"] != null || memory["image_urls"] != "")) {
+        var imageUrl = null;
+        var memory_card_image = null;
+        if (Array.isArray(memory["image_urls"]) && memory["image_urls"].length > 0) memory_card_image = memory["image_urls"][0];
+        if (typeof memory["image_urls"] === "string") memory_card_image = memory["image_urls"].split(",")[0]; // this safeguards against comma separated string (until I'm able to store it correctly)
+        if (memory_card_image) {
+          $("#memoryModal_image").html(
+            `<img src="${memory_card_image}" class="card-img-top" alt="...">`
+          );
         }
+        
+        //edit_memory_ids = memory.file_ids;
         get_photo_url(edit_memory_ids);
       } else {
         $("#memoryModal_image").html(" ");
@@ -690,7 +685,7 @@ async function display_memory_modal(id) {
       $("#memoryModal_subject").text(memory.subject);
       $("#memoryModal_date").text(memory.when);
       $("#memoryModal_where").text(memory.where);
-      $("#memoryModal_description").text(memory.description);
+      $("#memoryModal_description").text(memory.summary);
       if (memory.how == "") {
         $("#memoryModal_how").html(`<i class="fa ${emotions["default"][0]}" style="color: ${emotions["default"][1]};"></i>`);
       } else {
@@ -709,7 +704,7 @@ async function display_memory_modal(id) {
       }
 
       $("#memoryModal_lastUpdated").text(`Last updated on ${memory.date_modified.replace("T", " ").substring(0, memory.date_modified.lastIndexOf("."))}`);
-      $("#memoryModal_related_memories").html(await render_related_memories(memory.relatedMemories, 6)); 
+      if(memory.relatedMemories.length > 0) $("#memoryModal_related_memories").html(await render_related_memories(memory.relatedMemories, 10)); 
       $("#memoryModal_btn_narrate").on("click", function () {
         readOutLoud(memory.summary);
       });
@@ -753,6 +748,7 @@ async function display_memory_modal(id) {
       showLoader(false);
     })
     .catch(function (error) {
+      showLoader(false);
       console.log(error);
     });
 }
@@ -813,13 +809,10 @@ function save_memory_details() {
 function readOutLoud(message) {
   speech.text = message;
   window.speechSynthesis.speak(speech);
+}
 
-  // const artyom = new Artyom();
-  // if (artyom.speechSupported()) {
-    //artyom.say(message);
-  // } else {
-  //   Unsupported :/
-  // }
+function shutUp() {
+  window.speechSynthesis.cancel();
 }
 
 function showLoader(show = true) {
@@ -991,7 +984,7 @@ function chat_sendButton() {
 
   update_messages();
 
-  walker_run_talk("talk", utterance, upload_ids, current_file_url)
+  walker_run_talk("talk", utterance, create_memory_images, current_file_url)
     .then((result) => {
       chat_messages.push(["bot", result.report[0]["response"]]);
       readOutLoud(result.report[0]["response"]);
@@ -1033,40 +1026,51 @@ async function imageUploaded() {
   file_upload = true;
 
   extension = file.name;
+  create_memory_images.push(imageUrl);
+  if (create_memory_images.length > 0) {
+    current_file_url = imageUrl;
+    document.getElementById("photos").style.display = "block";
+    $("#create_fileId").val(""); // clear input field
+  }
+  c_memory_photos = ``;
+  for (let i = 0; i < create_memory_images.length; i++) {
+    image_src = create_memory_images[i];
+    c_memory_photos = c_memory_photos + `<div class="td"><img src="${image_src}" style="height: 200px;width:auto;"></div>`;
+    $("#photos").html(`<div class="tb"><div class="tr">${c_memory_photos}</div></div>`);
+  }
+  // var reader = new FileReader();
 
-  var reader = new FileReader();
+  // reader.onload = async function () {
+  //   base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
+  //   imageBase64Stringsep = base64String;
+  //   create_memory_images.push(base64String);
+  //   console.log(create_memory_images);
+  //   // console.log(base64String);
 
-  reader.onload = async function () {
-    base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
-    imageBase64Stringsep = base64String;
-    create_memory_images.push(base64String);
-    console.log(create_memory_images);
-    // console.log(base64String);
+    // await walker_run_upload(extension, imageUrl)
+    //   .then((result) => {
+    //     console.log(result.report[0][0]["context"]["id"]);
 
-    await walker_run_upload(extension, imageUrl)
-      .then((result) => {
-        console.log(result.report[0][0]["context"]["id"]);
+    //     if (create_memory_images.length > 0) {
+    //       upload_ids.push(result.report[0][0]["context"]["id"]);
+    //       current_file_url = result.report[0][0]["context"]["url"];
+    //       document.getElementById("photos").style.display = "block";
+    //       $("#create_fileId").val(""); // clear input field
+    //     }
 
-        if (create_memory_images.length > 0) {
-          upload_ids.push(result.report[0][0]["context"]["id"]);
-          current_file_url = result.report[0][0]["context"]["url"];
-          document.getElementById("photos").style.display = "block";
-          $("#create_fileId").val(""); // clear input field
-        }
+    //     c_memory_photos = ``;
+    //     for (let i = 0; i < create_memory_images.length; i++) {
+    //       image_src = create_memory_images[i];
+    //       c_memory_photos = c_memory_photos + `<div class="td"><img src="${image_src}" style="height: 200px;"></div>`;
+    //       $("#photos").html(`<div class="tb"><div class="tr">${c_memory_photos}</div></div>`);
+    //     }
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
+  //};
 
-        c_memory_photos = ``;
-        for (let i = 0; i < create_memory_images.length; i++) {
-          image_src = "data:image/png;base64," + create_memory_images[i];
-          c_memory_photos = c_memory_photos + `<div class="td"><img src="${image_src}" style="height: 200px;"></div>`;
-          $("#photos").html(`<div class="tb"><div class="tr">${c_memory_photos}</div></div>`);
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
-
-  reader.readAsDataURL(file);
+  // reader.readAsDataURL(file);
 }
 
 async function editImageUploaded() {
@@ -1136,7 +1140,7 @@ function update_file_id(memory_id, file_ids){
   });
 }
 
-function walker_run_talk(name, utterance = "", file_ids = [], file_url = "") {
+function walker_run_talk(name, utterance = "", image_urls = [], file_url = "") {
   //if(file_ids.length > 0) {
   query = `
     {
@@ -1152,7 +1156,7 @@ function walker_run_talk(name, utterance = "", file_ids = [], file_url = "") {
       "name": "${name}",
       "ctx": {
         "question": "${utterance}", 
-        "file_ids": ${JSON.stringify(file_ids)},
+        "image_urls": ${JSON.stringify(image_urls)},
         "file_url": "${file_url}"
       }
     }
@@ -1249,6 +1253,7 @@ async function walker_get_file(file_id) {
 }
 
 function walker_get_memories(question = "") {
+  showLoader(true);
   query = `
   {
     "name": "get_memories",
@@ -1275,8 +1280,12 @@ function walker_get_memories(question = "") {
     },
     body: query,
   }).then(function (result) {
+    showLoader(false);
     return result.json();
-  });
+  }).catch(function (error) {
+    showLoader(false);
+    console.log(error);
+  });;
 }
 
 async function walker_get_memory(id) {
