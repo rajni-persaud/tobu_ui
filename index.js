@@ -189,7 +189,7 @@ document.getElementById("app-interact").parentNode.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
           <p class="modal-title" id="createMemoryModalLabel"> Capture a memory</p>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick="display_memory_feed()"><span aria-hidden="true">&times;</span></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick="display_memory_feed();reset_capture_modal();"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body">
         <!-- <button type="button" class="btn btn-outline-secondary">Add Photo/Video</button> -->
@@ -305,50 +305,9 @@ var current_file_url = "";
 var file_upload = false;
 var current_memory_photos = [];
 var current_memory_id = "";
-// var loading = true;
-// var t = setInterval(function (){
-//   if(loading){
-//     $("#main_app").addClass("transparent");
-//     $('.loader').show();
-//     //document.querySelector('#ask_tobu_btn').disabled = true;
-//   }
-//   else{
-//     $("#main_app").removeClass("transparent");
-//     $('.loader').hide();
-//     //document.querySelector('#ask_tobu_btn').disabled = false;
-//   }
-// },1000);
 
 // get input from query field
 var query_inputField = document.getElementById("query__inputField");
-
-// function start_listening(){
-//   var speechRecognizer = new webkitSpeechRecognition();
-//   speechRecognizer.continuous = true;
-//   speechRecognizer.interimResults = true;
-//   speechRecognizer.start();
-  
-//   var finalTranscripts = "";
-//   speechRecognizer.onresult = function(event){
-//       var interimTranscripts = "";
-//       for(var i=event.resultIndex; i<event.results.length; i++){
-//           var transcript = event.results[i][0].transcript;
-//           transcript.replace("\n", "<br>");
-//           if(event.results[i].isFinal){
-//               finalTranscripts += transcript;
-//           }
-//           else{
-//               interimTranscripts += transcript;
-//               console.log("You said: "+interimTranscripts);
-//           }
-//       }
-
-//       if(interimTranscripts.includes("create") && interimTranscripts.includes("memory") && interimTranscripts.includes("hi")){
-//           speechRecognizer.stop();
-//           display_capture_modal();
-//       }
-//   };
-// }
 
 //fetches and renders memories in the feed area
 async function display_memory_feed() {
@@ -398,23 +357,8 @@ async function display_memory_feed() {
       });
   }
 
-  // startContinuousArtyom();
-  //start_listening();
 }
 
-//fetches and renders memories in the feed area based on a query
-// function display_query_memories(question) {
-//   var memories = [];
-
-//   walker_query_memories(question).then((result) => {
-
-//     memories = result.report[0];
-//     render_memories(memories);
-
-//   }).catch(function (error) {
-//     console.log(error);
-//   });
-// }
 
 function isValidTimestamp(_timestamp) {
   const newTimestamp = new Date(_timestamp).getTime();
@@ -585,13 +529,6 @@ function display_askTobu_alert(num_memories, query_value) {
 
 //displays the capture a memory modal
 async function display_capture_modal() {
-  //reset the conversation
-  chat_messages = [];
-  $("#photos").html(``); // resets photos
-  $("#photos").hide();
-  $("#create_fileId").val(""); // clear input field
-  create_memory_images = [];
-  upload_ids = [];
 
   await walker_yield_clear().then((result) => {
       $("#createMemoryModal").modal({backdrop: 'static', keyboard: false});
@@ -610,6 +547,18 @@ async function display_capture_modal() {
     .catch(function (error) {
       console.log(error);
     });
+}
+
+function reset_capture_modal() {
+    shutUp();
+    //reset the conver.sation
+    chat_messages = [];
+    document.getElementById("chatbox").innerHTML = ""
+    $("#photos").html(``); // resets photos
+    $("#photos").hide();
+    $("#create_fileId").val(""); // clear input field
+    create_memory_images = [];
+    upload_ids = [];
 }
 
 async function get_photo_url(memory_photo_ids){
@@ -685,7 +634,7 @@ async function display_memory_modal(id) {
       $("#memoryModal_subject").text(memory.subject);
       $("#memoryModal_date").text(memory.when);
       $("#memoryModal_where").text(memory.where);
-      $("#memoryModal_description").text(memory.summary);
+      $("#memoryModal_description").text(memory.description);
       if (memory.how == "") {
         $("#memoryModal_how").html(`<i class="fa ${emotions["default"][0]}" style="color: ${emotions["default"][1]};"></i>`);
       } else {
@@ -1038,39 +987,6 @@ async function imageUploaded() {
     c_memory_photos = c_memory_photos + `<div class="td"><img src="${image_src}" style="height: 200px;width:auto;"></div>`;
     $("#photos").html(`<div class="tb"><div class="tr">${c_memory_photos}</div></div>`);
   }
-  // var reader = new FileReader();
-
-  // reader.onload = async function () {
-  //   base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
-  //   imageBase64Stringsep = base64String;
-  //   create_memory_images.push(base64String);
-  //   console.log(create_memory_images);
-  //   // console.log(base64String);
-
-    // await walker_run_upload(extension, imageUrl)
-    //   .then((result) => {
-    //     console.log(result.report[0][0]["context"]["id"]);
-
-    //     if (create_memory_images.length > 0) {
-    //       upload_ids.push(result.report[0][0]["context"]["id"]);
-    //       current_file_url = result.report[0][0]["context"]["url"];
-    //       document.getElementById("photos").style.display = "block";
-    //       $("#create_fileId").val(""); // clear input field
-    //     }
-
-    //     c_memory_photos = ``;
-    //     for (let i = 0; i < create_memory_images.length; i++) {
-    //       image_src = create_memory_images[i];
-    //       c_memory_photos = c_memory_photos + `<div class="td"><img src="${image_src}" style="height: 200px;"></div>`;
-    //       $("#photos").html(`<div class="tb"><div class="tr">${c_memory_photos}</div></div>`);
-    //     }
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-  //};
-
-  // reader.readAsDataURL(file);
 }
 
 async function editImageUploaded() {
