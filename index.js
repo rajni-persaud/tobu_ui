@@ -201,8 +201,8 @@ document.getElementById("app-interact").parentNode.innerHTML = `
         <div class="modal-footer" style="padding-right: 10%">
         <!-- User input box -->
             <span class="fa-stack fa-1x"><i id="chat_mic-bg" class="fa fa-circle fa-stack-2x icon-background" style="margin-left: -13px; color: #ffffff;"></i><i id="chat_mic-btn" class="fa fa-microphone fa-stack-1x" style="margin-left: -5px;" onclick="chat_mic_click()"></i></span> 
-            <input id="chatio__inputField" style="width: 950px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;" "="" type="text" name="msg" placeholder="describe your memory">
-            <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="chat_sendButton()">Send</button></div>
+            <input id="chatio__inputField" style="width: 950px;float: left;border-color: whitesmoke;height: 47px;border-width: 0px;" "="" type="text" name="msg" placeholder="describe your memory"a>
+            <div style="display: inline;float: left;height: 47px; width: 25px;"><button type="button" class="btn btn-outline-secondary" onclick="sendMessage()">Send</button></div>
         </div>
       </div>
     </div>
@@ -549,6 +549,17 @@ async function display_capture_modal() {
     });
 }
 
+function close_capture_modal_after_speaking() {
+  setTimeout(function () {
+    if(!window.speechSynthesis.speaking) {
+      $("#createMemoryModal").modal("hide");
+      reset_capture_modal();
+      display_memory_feed();
+    } else close_capture_modal_after_speaking();
+  }, 1000);
+
+}
+
 function reset_capture_modal() {
     shutUp();
     //reset the conver.sation
@@ -788,6 +799,13 @@ chat_recognition.continuous = true;
 chat_recognition.interimResults = true;
 chat_stat = true;
 
+chat_textbox.keyup(function(event) {
+  if (event.which === 13) {
+      event.preventDefault();
+      sendMessage();
+  }
+});
+
 chat_recognition.onstart = function () {
   console.log("Recording start");
   chat_finalTranscripts = "";
@@ -797,7 +815,7 @@ chat_recognition.onstart = function () {
 
 chat_recognition.onend = function () {
   console.log("Recording end");
-  chat_sendButton();
+  sendMessage();
   document.getElementById("chat_mic-btn").style.color = "#000000";
   document.getElementById("chat_mic-bg").style.color = "#ffffff";
   chat_content = "";
@@ -912,6 +930,11 @@ function update_messages() {
   conv = "";
   for (let i = 0; i < chat_messages.length; i++) {
     if (chat_messages[i][0] == "bot") {
+      //evaluate whether its the final message to close dialog
+      if( (chat_messages[i][1]).includes("I've recorded that")) {
+        console.log("dialog ended");
+        close_capture_modal_after_speaking();
+      }
       new_message =
         '<p class="botText"><span>' + chat_messages[i][1] + "</span></p>";
     } else {
@@ -924,25 +947,26 @@ function update_messages() {
   chat_inputField.value = "";
 }
 
-function chat_sendButton() {
+function sendMessage() {
   var utterance = chat_inputField.value;
 
-  if (utterance) {
+  if (utterance.trim()) {
     chat_messages.push(["user", utterance]);
+
+    update_messages();
+
+    walker_run_talk("talk", utterance, create_memory_images, current_file_url)
+      .then((result) => {
+        chat_messages.push(["bot", result.report[0]["response"]]);
+        readOutLoud(result.report[0]["response"]);
+
+        update_messages();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
-  update_messages();
-
-  walker_run_talk("talk", utterance, create_memory_images, current_file_url)
-    .then((result) => {
-      chat_messages.push(["bot", result.report[0]["response"]]);
-      readOutLoud(result.report[0]["response"]);
-
-      update_messages();
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
 }
 
 async function uploadImage(file) {
